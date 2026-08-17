@@ -1,0 +1,177 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://api.malt.com/ ("Malt - API Guidelines" OpenAPI info.description) and
+  openapi/malt-exposed-apis-openapi.yml
+note: >-
+  Malt's cross-cutting semantics come from a single source: the long info.description on its
+  unified OpenAPI, which is the whole of its API guidance. It covers authentication and the two
+  auth error shapes and nothing else. Two things stand out. First, the API is bimodal: the
+  /freelancer/* billing endpoints are a bespoke Malt design, while /scim/v2/Users is a
+  standards-conformant SCIM 2.0 implementation carrying SCIM's own conventions (filter grammar,
+  1-based startIndex pagination, PATCH op documents, application/scim+json). A client must
+  therefore hold two different sets of rules for one host. Second, several conventions a
+  production integration needs are simply absent — no idempotency contract, no request-id, no
+  rate-limit signalling, no versioning policy on the /freelancer surface.
+authentication:
+  style: opaque token in the Authorization header
+  header: Authorization
+  scheme_note: >-
+    The documented usage is a BARE token — `Authorization: your-api-token-here` — with no
+    `Bearer ` prefix. The spec declares two schemes, an apiKey scheme named ApiKeyAuth (in:
+    header, name: Authorization) and an http/bearer scheme named BearerAuth with bearerFormat
+    JWT. Only ApiKeyAuth is actually applied to operations (the six SCIM operations); the seven
+    freelancer billing operations declare NO security at all, and the document's global
+    `security` is an empty array. The bare-token form in the prose and the bearer scheme in the
+    spec disagree.
+  token_types:
+  - Freelancer account token
+  - Client team token
+  - Organization token
+  scope_model: identity-based (the token's identity determines what is visible)
+  self_serve: partial
+  self_serve_note: >-
+    Freelancer tokens are self-served at https://www.malt.com/account/tokens (My Account > API
+    Keys) with selectable permission scopes. Client team and organization tokens are obtained
+    "from your Malt representative" — a sales gate.
+  token_display_once: true
+  see: authentication/malt-authentication.yml
+idempotency:
+  supported: false
+  header: null
+  finding: >-
+    Malt documents no idempotency contract. There is no Idempotency-Key header or parameter
+    anywhere in the spec, and the guidelines do not mention retry safety. The four write
+    operations are all SCIM: POST /scim/v2/Users (createUser) is NOT idempotent and has no
+    dedupe key, while PUT, PATCH and DELETE on /scim/v2/Users/{userId} are idempotent only by
+    HTTP method semantics, which is a property of the verb rather than a guarantee Malt makes.
+    An agent retrying a failed createUser after a timeout can create a duplicate user.
+    No `Idempotency` pointer is emitted in apis.yml for this provider.
+pagination:
+  bimodal: true
+  freelancer_surface:
+    style: date-range filter, no pagination
+    params:
+    - name: since
+      required: true
+      in: query
+      format: date (ISO)
+      note: Required on all three list operations.
+    - name: until
+      required: false
+      in: query
+      format: date (ISO)
+    response_envelope: unpaged array of resources
+    finding: >-
+      The three list operations (findInvoices, findPayments, findFeeInvoices) take a date window
+      and return the whole result set. There is no cursor, no page/offset, no limit, and no
+      next-link. A freelancer with a long history and a wide `since` gets one unbounded response.
+      A `PageResource` schema IS defined in components, but nothing in the freelancer surface
+      references it.
+  scim_surface:
+    style: SCIM 2.0 index pagination (RFC 7644 section 3.4.2.4)
+    params:
+    - name: startIndex
+      in: query
+      type: integer
+      note: 1-based, per SCIM.
+    - name: count
+      in: query
+      type: integer
+    - name: filter
+      in: query
+      type: string
+      note: SCIM filter grammar.
+    response_envelope: SCIM ListResponse (UserPage schema)
+    conformant: true
+field_expansion:
+  supported: false
+sparse_fieldsets:
+  supported: false
+  note: >-
+    SCIM's standard `attributes` / `excludedAttributes` query parameters are not declared on
+    Malt's /scim/v2/Users operations.
+metadata:
+  freelancer_surface: false
+  scim_surface: true
+  scim_note: SCIM resources carry the standard `meta` object (ScimEntity_meta schema).
+  extensions:
+    MaltUserExtension: >-
+      Malt declares a SCIM extension schema (MaltUserExtension) for Malt-specific user
+      attributes on top of the core SCIM User.
+request_tracing:
+  request_id_header: null
+  supported: false
+  finding: >-
+    No request-id or correlation-id header is documented or returned. Debugging a failed call with
+    Malt support means describing it in prose. Responses do carry a Cloudflare `cf-ray` value,
+    but that is edge infrastructure, not a Malt API request identifier.
+versioning:
+  bimodal: true
+  freelancer_surface:
+    scheme: none
+    current: null
+    finding: >-
+      The /freelancer/* paths carry no version segment, no version header and no date-based
+      version. The OpenAPI document's own info.version is "0.0.1". There is no published policy
+      for how a breaking change would be introduced.
+  scim_surface:
+    scheme: uri-path
+    current: v2
+    note: /scim/v2/ — the version is SCIM's, mandated by RFC 7644, not a Malt versioning policy.
+  see: lifecycle/malt-lifecycle.yml
+error_envelope:
+  format: Spring Boot default error body
+  media_type: application/json
+  rfc9457: false
+  shape:
+    timestamp: ISO-8601 timestamp
+    status: numeric HTTP status
+    error: HTTP reason phrase
+    path: the request path
+  documented_example: |
+    {
+       "timestamp": "1970-01-01T00:00:00.000+00:00",
+       "status": 401,
+       "error": "Unauthorized",
+       "path": "/exposed/endpoint"
+    }
+  finding: >-
+    The documented error body is the stock Spring Boot error map — timestamp/status/error/path.
+    It carries no machine-readable error code, no message, and no remediation field, so a client
+    cannot distinguish "token expired" from "token lacks scope" from "wrong token type" beyond
+    the HTTP status. It is not RFC 9457 problem+json. Observed live behaviour is thinner still:
+    unauthenticated requests to both /freelancer/invoices and /scim/v2/Users return 401 with
+    content-length: 0 — no body at all, so the documented envelope did not appear.
+    An `ErrorResponse` schema exists in components but no operation declares it as a response.
+  see: errors/malt-problem-types.yml
+rate_limit_signaling:
+  documented: false
+  headers: []
+  finding: >-
+    The getting-started list promises "Rate Limiting Guidelines" and the document contains none.
+    No limit values, no headers, no 429 declared on any operation.
+  see: rate-limits/malt-rate-limits.yml
+content_negotiation:
+  request: application/json
+  response:
+  - application/json
+  - application/scim+json
+  note: SCIM operations offer both application/json and application/scim+json.
+  finding: >-
+    The three SCIM write operations declare their requestBody content as `*/*` rather than a
+    concrete media type — a code-generation artifact rather than a deliberate contract, and it
+    means a generated client has no request schema for createUser, replaceUser or modifyUser.
+binary_responses:
+  finding: >-
+    getInvoicePdf and getFeeInvoicePdf both declare their 200 response as application/json
+    returning a PDFInvoiceResource, not application/pdf — so the PDF arrives as JSON-wrapped
+    data (or a link) rather than as a binary stream. Worth flagging: the operation names say
+    "pdf" but the contract says JSON.
+cross_links:
+  authentication: authentication/malt-authentication.yml
+  errors: errors/malt-problem-types.yml
+  lifecycle: lifecycle/malt-lifecycle.yml
+  rate_limits: rate-limits/malt-rate-limits.yml
+  conformance: conformance/malt-conformance.yml
+  data_model: data-model/malt-data-model.yml

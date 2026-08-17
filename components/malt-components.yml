@@ -1,0 +1,125 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  registry.npmjs.org metadata for the @maltjoy/* packages plus the published package file tree
+  read from data.jsdelivr.com/v1/packages/npm/@maltjoy/core@5.12.0
+note: >-
+  Malt publishes "Joy", its internal design system, as public npm packages under the @maltjoy
+  scope. These are genuine client-side UI components — Stencil-compiled custom elements with a
+  `joy-` tag prefix — not embeddable surfaces for the Malt API. There is no Malt-hosted embedded
+  widget, no iframe/Elements-style checkout or dashboard component, and no client-side JS that
+  talks to api.malt.com. Recorded here because the component library is real, first-party and
+  publicly installable; a developer integrating the Malt API gets no UI layer from it.
+  The design system source repository (gitlab.com/maltcommunity/apps/design-system) is private —
+  it redirects to a GitLab SAML SSO login — so the component list below was derived from the
+  published package's own file tree, not from documentation.
+distribution:
+  registries:
+  - npm
+  cdn:
+  - https://cdn.jsdelivr.net/npm/@maltjoy/core@5.12.0/
+  - https://unpkg.com/@maltjoy/core@5.12.0/
+  cdn_note: >-
+    No Malt-published CDN loader URL exists — the packages are simply resolvable through the
+    generic npm CDNs. Malt does not document a script-tag install.
+  docs: null
+  docs_note: >-
+    No public design-system documentation site was found. maltjoy.malt.com and design.malt.com do
+    not resolve; the GitLab repo is SSO-gated.
+  source_repository: https://gitlab.com/maltcommunity/apps/design-system
+  source_repository_access: private (GitLab SAML SSO)
+families:
+- family: Joy web components
+  package: "@maltjoy/core"
+  version: 5.12.0
+  published: '2026-01-21'
+  technology: Stencil (framework-agnostic custom elements)
+  tag_prefix: joy-
+  component_count: 47
+  loader: dist/loader.js (Stencil lazy loader), dist/esm/index.js
+  components:
+  - JoyAvailability
+  - JoyAvatar
+  - JoyBadgeLevel
+  - JoyBottomSheet
+  - JoyButton
+  - JoyCheckbox
+  - JoyCollapse
+  - JoyCollapseItem
+  - JoyCompanyAvatar
+  - JoyCounter
+  - JoyDialog
+  - JoyDialogTrigger
+  - JoyDividerCta
+  - JoyDrawer
+  - JoyDropzone
+  - JoyFormError
+  - JoyHighlight
+  - JoyIcon
+  - JoyIndicator
+  - JoyIndicators
+  - JoyInput
+  - JoyLabel
+  - JoyLink
+  - JoyPagination
+  - JoyPanel
+  - JoyPanelSection
+  - JoyProductTour
+  - JoyProductTourTrigger
+  - JoyRadio
+  - JoyRadioGroup
+  - JoyRatingStars
+  - JoySelect
+  - JoySelectableItem
+  - JoySelectableItemGroup
+  - JoySnackbar
+  - JoySpinner
+  - JoyStep
+  - JoyStepper
+  - JoyTag
+  - JoyTagsList
+  - JoyText
+  - JoyTextarea
+  - JoyTimeSavingCalculator
+  - JoyTooltip
+  - JoyTooltipTrigger
+  - JoyUserCard
+  - JoyWrapper
+  domain_specific:
+  - name: JoyAvailability
+    note: Freelancer availability indicator — marketplace-domain component.
+  - name: JoyBadgeLevel
+    note: Freelancer level/badge display (Super Malter style progression).
+  - name: JoyRatingStars
+    note: Freelancer rating display.
+  - name: JoyUserCard
+    note: Freelancer profile card.
+  - name: JoyCompanyAvatar
+    note: Client company avatar.
+  - name: JoyTimeSavingCalculator
+    note: Marketing calculator widget used on Malt's own surfaces.
+- family: Design tokens / CSS
+  package: "@maltjoy/css"
+  version: 5.20.0
+  published: '2026-05-06'
+  technology: CSS custom properties + utility framework for tokens
+- family: Themes
+  package: "@maltjoy/themes"
+  version: 6.0.1
+  published: '2026-07-13'
+  technology: Token-based theme modules
+- family: Icons
+  package: "@maltjoy/icons"
+  version: 6.0.1
+  published: '2026-07-13'
+  technology: Icon set
+- family: Layout
+  package: "@maltjoy/layout"
+  version: 5.12.0
+  published: '2026-01-21'
+  technology: Layout primitives / grid ecosystem
+embedded_api_surfaces:
+  count: 0
+  finding: >-
+    Malt ships no embeddable component backed by its API — no hosted checkout, no embedded
+    invoice viewer, no talent-search widget. Every @maltjoy package is presentational.

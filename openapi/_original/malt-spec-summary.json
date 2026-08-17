@@ -1,0 +1,241 @@
+[
+  {
+    "id": "unified-exposed-apis",
+    "file": "unified-exposed-apis.json",
+    "title": "Malt - API Guidelines",
+    "tags": [
+      {
+        "description": "Operations related to freelancer invoices",
+        "name": "Invoices"
+      },
+      {
+        "description": "Operations related to freelancer payments",
+        "name": "Payments"
+      },
+      {
+        "description": "Operations related to freelancer service charge invoices",
+        "name": "Fee Invoices"
+      },
+      {
+        "description": "Manage users",
+        "name": "SCIM"
+      }
+    ],
+    "paths": [
+      "/freelancer/invoices",
+      "/freelancer/invoices/{id}",
+      "/freelancer/invoices/{id}/pdf",
+      "/freelancer/payments",
+      "/freelancer/fee-invoices",
+      "/freelancer/fee-invoices/{id}",
+      "/freelancer/fee-invoices/{id}/pdf",
+      "/scim/v2/Users",
+      "/scim/v2/Users/{userId}"
+    ],
+    "operations": [
+      {
+        "operationId": "findInvoices",
+        "summary": "Retrieve a list of invoices from a date range",
+        "tags": [
+          "Invoices"
+        ]
+      },
+      {
+        "operationId": "getInvoice",
+        "summary": "Get an invoice by its id",
+        "tags": [
+          "Invoices"
+        ]
+      },
+      {
+        "operationId": "getInvoicePdf",
+        "summary": "Get an invoice PDF by its id",
+        "tags": [
+          "Invoices"
+        ]
+      },
+      {
+        "operationId": "findPayments",
+        "summary": "Retrieve list of payments from a range of date",
+        "tags": [
+          "Payments"
+        ]
+      },
+      {
+        "operationId": "findFeeInvoices",
+        "summary": "Retrieve a list of service charge invoices from a date range",
+        "tags": [
+          "Fee Invoices"
+        ]
+      },
+      {
+        "operationId": "getFeeInvoice",
+        "summary": "Get a service charge invoice by its id",
+        "tags": [
+          "Fee Invoices"
+        ]
+      },
+      {
+        "operationId": "getFeeInvoicePdf",
+        "summary": "Get an fee invoice PDF by its id",
+        "tags": [
+          "Fee Invoices"
+        ]
+      },
+      {
+        "operationId": "findUsers",
+        "summary": "Query existing users",
+        "tags": [
+          "SCIM"
+        ]
+      },
+      {
+        "operationId": "createUser",
+        "summary": "Create a user",
+        "tags": [
+          "SCIM"
+        ]
+      },
+      {
+        "operationId": "deleteUser",
+        "summary": "Delete a user",
+        "tags": [
+          "SCIM"
+        ]
+      },
+      {
+        "operationId": "getUserById",
+        "summary": "Fetch an existing user",
+        "tags": [
+          "SCIM"
+        ]
+      },
+      {
+        "operationId": "modifyUser",
+        "summary": "Modify a user (only accepts setting `active` to `false` for now)",
+        "tags": [
+          "SCIM"
+        ]
+      },
+      {
+        "operationId": "replaceUser",
+        "summary": "Replace a user",
+        "tags": [
+          "SCIM"
+        ]
+      }
+    ],
+    "schemas": [
+      {
+        "name": "InvoiceResource",
+        "description": "Represents a freelancer invoice",
+        "type": "object"
+      },
+      {
+        "name": "PaymentResource",
+        "description": "Represents a payment made to the freelancer",
+        "type": "object"
+      },
+      {
+        "name": "FeeInvoiceResource",
+        "description": "Represents a service charge invoice",
+        "type": "object"
+      },
+      {
+        "name": "PDFInvoiceResource",
+        "description": "Represents an invoice in PDF format",
+        "type": "object"
+      },
+      {
+        "name": "LightInvoiceResource",
+        "description": "Lightweight representation of an invoice",
+        "type": "object"
+      },
+      {
+        "name": "CustomerResource",
+        "description": "Represents a customer (client) for invoicing",
+        "type": "object"
+      },
+      {
+        "name": "SupplierResource",
+        "description": "Represents a supplier (freelancer) for invoicing",
+        "type": "object"
+      },
+      {
+        "name": "TaxResource",
+        "description": "Represents a tax line item",
+        "type": "object"
+      },
+      {
+        "name": "LightInvoiceType",
+        "description": "Type of invoice",
+        "type": "string"
+      },
+      {
+        "name": "PageResource",
+        "description": "A page of resources",
+        "type": "object"
+      },
+      {
+        "name": "ScimEntity",
+        "description": "A SCIM entity",
+        "type": "object"
+      },
+      {
+        "name": "MaltUserExtension",
+        "description": "Malt User Extension",
+        "type": "object"
+      },
+      {
+        "name": "SubmittedUserResource",
+        "description": "A user",
+        "type": "object"
+      },
+      {
+        "name": "UserResource",
+        "description": "A user",
+        "type": "object"
+      },
+      {
+        "name": "UserPatchBody",
+        "description": "Body of a PATCH request for a given user",
+        "type": "object"
+      },
+      {
+        "name": "UserPage",
+        "description": "A page of users",
+        "type": "object"
+      },
+      {
+        "name": "ErrorResponse",
+        "description": "",
+        "type": "object"
+      },
+      {
+        "name": "ScimEntity_meta",
+        "description": "Metadata related to this resource",
+        "type": "object"
+      },
+      {
+        "name": "SubmittedUserResource_name",
+        "description": "Actual name of the user",
+        "type": "object"
+      },
+      {
+        "name": "SubmittedUserResource_phoneNumbers_inner",
+        "description": "",
+        "type": "object"
+      },
+      {
+        "name": "UserResource_allOf_emails",
+        "description": "",
+        "type": "object"
+      },
+      {
+        "name": "UserPatchBody_Operations_inner",
+        "description": "",
+        "type": "object"
+      }
+    ]
+  }
+]

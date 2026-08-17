@@ -1,0 +1,341 @@
+generated: '2026-08-17'
+method: derived
+source: openapi/malt-exposed-apis-openapi.yml (22 component schemas, $ref graph and id-reference fields)
+note: >-
+  Two disjoint entity graphs share one host. The billing graph is a conventional
+  invoice/payment/party model: an Invoice belongs to a Customer and a Supplier and carries Taxes;
+  a Payment settles one or more Invoices through a light reference. The SCIM graph is the RFC 7643
+  User model with a Malt extension. Nothing links the two — a SCIM User is not connected to an
+  Invoice's Supplier or Customer in the contract, even though in the product they describe the
+  same people and companies. Worth recording: the party objects (CustomerResource,
+  SupplierResource) are INLINE VALUE OBJECTS with no `id` field of their own, so a client cannot
+  address a customer or supplier as a resource, cannot list them, and cannot join across invoices
+  except by string-matching the name and registration/VAT numbers.
+render: null
+entities:
+- name: InvoiceResource
+  domain: billing
+  addressable: true
+  id_field: id
+  id_prefix: null
+  operations:
+  - findInvoices
+  - getInvoice
+  - getInvoicePdf
+  required:
+  - id
+  - title
+  - creationDate
+  - expectedPaymentDate
+  - amountAllTaxesIncluded
+  - amountWithoutTaxes
+  - taxes
+  - customer
+  - supplier
+  fields:
+    id: string
+    title: string
+    creationDate: date-time
+    expectedPaymentDate: date-time
+    externalId: string (client-supplied external identifier)
+    amountAllTaxesIncluded: decimal
+    amountWithoutTaxes: decimal
+  note: >-
+    A freelancer's invoice to a client. Carries no explicit currency field of its own — currency
+    appears only on PaymentResource — so an invoice amount is unlabelled in the contract.
+- name: FeeInvoiceResource
+  domain: billing
+  addressable: true
+  id_field: id
+  operations:
+  - findFeeInvoices
+  - getFeeInvoice
+  - getFeeInvoicePdf
+  required:
+  - id
+  - title
+  - amountAllTaxesIncluded
+  - amountWithoutTaxes
+  - taxes
+  - customer
+  - supplier
+  note: >-
+    Malt's own service charge billed to the freelancer — the platform's take, exposed as a
+    first-class invoice object. Structurally identical to InvoiceResource minus creationDate and
+    expectedPaymentDate, which means a fee invoice carries NO DATE FIELD AT ALL even though it is
+    retrieved by a since/until date range.
+- name: PaymentResource
+  domain: billing
+  addressable: false
+  id_field: id
+  addressable_note: >-
+    Payments have an id but no GET /freelancer/payments/{id} operation — they are list-only.
+  operations:
+  - findPayments
+  required:
+  - id
+  - date
+  - amount
+  - currency
+  - invoices
+  fields:
+    id: string
+    date: date-time
+    amount: decimal
+    currency: string (currency code)
+    wireRef: string (wire transfer reference)
+- name: LightInvoiceResource
+  domain: billing
+  addressable: false
+  kind: reference-object
+  fields:
+    id: string
+    externalId: string
+    type: LightInvoiceType (enum-ish string)
+  note: >-
+    The join object between a Payment and the invoices it settles. Its `type` discriminates
+    invoice kind (invoice vs fee invoice), which is the only place in the model where the two
+    invoice families are unified.
+- name: PDFInvoiceResource
+  domain: billing
+  addressable: false
+  kind: representation
+  fields:
+    id: string
+    pdf: base64-encoded PDF content (format byte)
+  note: >-
+    The "PDF" operations return this JSON wrapper with the document base64-encoded in a `pdf`
+    field, declared as application/json — not a binary application/pdf stream. A client must
+    decode rather than stream, so large invoice sets are memory-expensive.
+- name: CustomerResource
+  domain: billing
+  addressable: false
+  kind: value-object
+  id_field: null
+  required:
+  - name
+  fields:
+    name: string
+    street: string
+    city: string
+    zip: string
+    country: string
+    countryCode: string (ISO)
+    registrationNumber: string (company registration number)
+    vatNumber: string (VAT identification number)
+  note: >-
+    No id. Embedded in each invoice. The client that engaged the freelancer.
+- name: SupplierResource
+  domain: billing
+  addressable: false
+  kind: value-object
+  id_field: null
+  required:
+  - name
+  fields: same shape as CustomerResource
+  note: >-
+    No id. The freelancer (or their company) issuing the invoice. Structurally identical to
+    CustomerResource — the same party shape reused for both sides of the transaction.
+- name: TaxResource
+  domain: billing
+  addressable: false
+  kind: value-object
+  required:
+  - name
+  - amount
+  - rate
+  fields:
+    name: string
+    amount: decimal (in the invoice currency)
+    rate: decimal (percentage)
+- name: UserResource
+  domain: identity
+  addressable: true
+  id_field: id
+  standard: SCIM 2.0 (RFC 7643 User)
+  composition: allOf [ScimEntity, SubmittedUserResource, {emails}]
+  operations:
+  - findUsers
+  - getUserById
+  - replaceUser
+  - modifyUser
+  - deleteUser
+- name: SubmittedUserResource
+  domain: identity
+  addressable: false
+  kind: request-shape
+  required:
+  - userName
+  - name
+  operations:
+  - createUser
+  fields:
+    externalId: string
+    userName: string (service provider's unique identifier for the user)
+    name: SubmittedUserResource_name (givenName + familyName, both required)
+    phoneNumbers: array of {value, primary} formatted per RFC 3966
+    urn:ietf:params:scim:schemas:extension:malt:2.0:User: MaltUserExtension
+- name: MaltUserExtension
+  domain: identity
+  addressable: false
+  kind: scim-extension
+  urn: urn:ietf:params:scim:schemas:extension:malt:2.0:User
+  fields:
+    companyAttributionId: string (company-specific attribution identifier)
+  note: >-
+    The single Malt-specific SCIM attribute. `companyAttributionId` is how a provisioned user is
+    tied back to a company's own cost-attribution scheme — the one place where Malt's enterprise
+    procurement model surfaces in the identity contract.
+- name: ScimEntity
+  domain: identity
+  addressable: false
+  kind: base-type
+  fields:
+    id: string
+    externalId: string
+    meta: ScimEntity_meta (resourceType, created, lastModified — ISO 8601)
+    schemas: array of string
+- name: UserPage
+  domain: identity
+  addressable: false
+  kind: collection-envelope
+  composition: allOf [PageResource, {Resources of UserResource}]
+- name: PageResource
+  domain: shared
+  addressable: false
+  kind: collection-envelope
+  fields:
+    totalResults: integer
+    startIndex: integer (1-based, SCIM)
+    itemsPerPage: integer
+    schemas: array of string
+    Resources: array
+  note: >-
+    Defined once and used only by the SCIM surface. The three billing list operations return bare
+    arrays and never reference it — a paging envelope that exists in the model but not in the
+    billing contract.
+- name: UserPatchBody
+  domain: identity
+  addressable: false
+  kind: request-shape
+  required:
+  - schemas
+  - Operations
+  operations:
+  - modifyUser
+  note: >-
+    SCIM PATCH operation document. Malt accepts only one operation in practice — setting `active`
+    to false — per the operation summary.
+- name: ErrorResponse
+  domain: shared
+  addressable: false
+  kind: error-shape
+  fields:
+    schemas: array of string
+    scimType: string
+    status: integer
+    detail: string
+  orphaned: true
+  note: >-
+    A SCIM-shaped error object that NO operation references. Every 4xx in the document declares an
+    empty content block, so this schema is defined and never delivered.
+relationships:
+- from: InvoiceResource
+  to: CustomerResource
+  kind: has_one
+  via: customer
+  required: true
+- from: InvoiceResource
+  to: SupplierResource
+  kind: has_one
+  via: supplier
+  required: true
+- from: InvoiceResource
+  to: TaxResource
+  kind: has_many
+  via: taxes
+  required: true
+- from: FeeInvoiceResource
+  to: CustomerResource
+  kind: has_one
+  via: customer
+  required: true
+- from: FeeInvoiceResource
+  to: SupplierResource
+  kind: has_one
+  via: supplier
+  required: true
+- from: FeeInvoiceResource
+  to: TaxResource
+  kind: has_many
+  via: taxes
+  required: true
+- from: PaymentResource
+  to: LightInvoiceResource
+  kind: has_many
+  via: invoices
+  required: true
+- from: LightInvoiceResource
+  to: InvoiceResource
+  kind: belongs_to
+  via: id
+  binding: id-reference
+  confidence: high
+  note: >-
+    LightInvoiceResource.id is the same identifier accepted by GET /freelancer/invoices/{id}
+    (or /freelancer/fee-invoices/{id}, discriminated by its `type`), so a payment can be walked
+    back to the invoices it settled.
+- from: LightInvoiceResource
+  to: LightInvoiceType
+  kind: has_one
+  via: type
+- from: PDFInvoiceResource
+  to: InvoiceResource
+  kind: belongs_to
+  via: id
+  binding: id-reference
+  confidence: high
+- from: UserResource
+  to: ScimEntity
+  kind: composed_of
+  via: allOf
+- from: UserResource
+  to: SubmittedUserResource
+  kind: composed_of
+  via: allOf
+- from: SubmittedUserResource
+  to: MaltUserExtension
+  kind: has_one
+  via: urn:ietf:params:scim:schemas:extension:malt:2.0:User
+- from: UserPage
+  to: UserResource
+  kind: has_many
+  via: Resources
+- from: UserPage
+  to: PageResource
+  kind: composed_of
+  via: allOf
+graph_findings:
+- kind: disjoint-graphs
+  detail: >-
+    The billing and identity graphs share no edge. There is no field on a SCIM UserResource that
+    resolves to a SupplierResource or CustomerResource, and no field on an invoice that resolves
+    to a SCIM user id. Two products, one host.
+- kind: unaddressable-parties
+  detail: >-
+    CustomerResource and SupplierResource have no `id` and no operations of their own. There is no
+    way to list a freelancer's clients, or to fetch one, or to join two invoices to the same
+    company except by comparing name / registrationNumber / vatNumber strings.
+- kind: no-currency-on-invoices
+  detail: >-
+    Amounts on InvoiceResource and FeeInvoiceResource carry no currency field. Currency appears
+    only on PaymentResource. A cross-border freelancer reading only invoices cannot tell the
+    denomination from the contract.
+- kind: fee-invoice-has-no-date
+  detail: >-
+    FeeInvoiceResource omits creationDate and expectedPaymentDate even though findFeeInvoices
+    filters on a since/until date range. The field the query filters on is not returned.
+- kind: payments-not-addressable
+  detail: >-
+    PaymentResource has an id but no single-fetch operation, so a payment id captured from a list
+    response cannot be re-resolved later.

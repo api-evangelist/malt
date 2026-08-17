@@ -1,0 +1,150 @@
+generated: '2026-08-17'
+method: derived
+source: mcp/malt-mcp.yml + openapi/malt-exposed-apis-openapi.yml
+note: >-
+  This crosswalk is unusual and the shape matters. Malt publishes NO MCP server and NO GraphQL
+  endpoint, so there is no live tool surface to bind. What it maps instead is the CANDIDATE tool
+  set derived from Malt's own OpenAPI (mcp/malt-mcp.yml) against the operations that back it —
+  a 1:1 binding at confidence high, because every candidate tool was generated from exactly one
+  published operationId. There are no mcp_only rows: nothing is exposed to agents that is not in
+  the REST contract, because nothing is exposed to agents at all. There are no rest_only rows
+  either: every one of the 13 operations has a candidate tool. The real divergence at Malt is not
+  between surfaces — it is between what the API exposes and what agents actually want from the
+  platform, which is recorded in divergence_finding below.
+surfaces:
+  openapi:
+    path: openapi/malt-exposed-apis-openapi.yml
+    source: https://api.malt.com/unified-exposed-apis.json
+    version: OpenAPI 3.0.3
+    operations: 13
+    gated: false
+    gated_note: The document is public; calling the operations requires a Malt identity token.
+  graphql:
+    endpoint: null
+    present: false
+    note: /graphql returns 404 on api.malt.com. No GraphQL surface exists.
+  mcp:
+    url: null
+    present: false
+    status: candidate-only
+    note: >-
+      No first-party MCP server. tools/list was not attempted because there is no endpoint to
+      POST to. Third-party community servers exist but scrape the web app rather than calling this
+      contract — see mcp/malt-mcp.yml third_party.
+crosswalk:
+- tool: find_invoices
+  category: billing
+  rest:
+  - findInvoices
+  binding: rest
+  confidence: high
+  note: Input schema inherited verbatim — since (required, date), until (optional, date).
+- tool: get_invoice
+  category: billing
+  rest:
+  - getInvoice
+  binding: rest
+  confidence: high
+- tool: get_invoice_pdf
+  category: billing
+  rest:
+  - getInvoicePdf
+  binding: rest
+  confidence: high
+  note: >-
+    Returns PDFInvoiceResource — base64 PDF inside a JSON body, declared application/json. An
+    agent tool must decode rather than stream.
+- tool: find_payments
+  category: billing
+  rest:
+  - findPayments
+  binding: rest
+  confidence: high
+- tool: find_fee_invoices
+  category: billing
+  rest:
+  - findFeeInvoices
+  binding: rest
+  confidence: high
+- tool: get_fee_invoice
+  category: billing
+  rest:
+  - getFeeInvoice
+  binding: rest
+  confidence: high
+- tool: get_fee_invoice_pdf
+  category: billing
+  rest:
+  - getFeeInvoicePdf
+  binding: rest
+  confidence: high
+- tool: find_users
+  category: identity-provisioning
+  rest:
+  - findUsers
+  binding: rest
+  confidence: high
+  note: Input schema inherited — SCIM filter grammar, startIndex (1-based), count.
+- tool: get_user
+  category: identity-provisioning
+  rest:
+  - getUserById
+  binding: rest
+  confidence: high
+- tool: create_user
+  category: identity-provisioning
+  rest:
+  - createUser
+  binding: rest
+  confidence: high
+  note: >-
+    requestBody content is declared as `*/*` rather than application/json or
+    application/scim+json, so the inherited inputSchema is the SubmittedUserResource schema by
+    reference only — a strict generator gets no media type to bind to. This is the weakest input
+    contract in the set.
+- tool: replace_user
+  category: identity-provisioning
+  rest:
+  - replaceUser
+  binding: rest
+  confidence: high
+  note: Same `*/*` requestBody problem as create_user.
+- tool: deactivate_user
+  category: identity-provisioning
+  rest:
+  - modifyUser
+  binding: rest
+  confidence: high
+  note: >-
+    Named for the actual accepted behaviour. Malt's operation summary restricts PATCH to setting
+    `active` to false, so a generic modify_user tool would advertise capability the API refuses.
+- tool: delete_user
+  category: identity-provisioning
+  rest:
+  - deleteUser
+  binding: rest
+  confidence: high
+  note: Frequently refused with 403 when the user has platform activity.
+mcp_only: []
+graphql_only: []
+rest_only: []
+coverage:
+  tools_named: 13
+  tools_bound: 13
+  mcp_only: 0
+  graphql_only: 0
+  rest_ops_total: 13
+  rest_ops_with_tool: 13
+  binding_confidence_high: 13
+  binding_confidence_medium: 0
+  binding_confidence_low: 0
+divergence_finding: >-
+  The interesting gap at Malt is not between REST, GraphQL and MCP — only REST exists. It is
+  between the API and the platform. Malt's product is talent discovery and freelance engagement:
+  search profiles, read availability and rates, send and manage project offers, run missions. Not
+  one of those capabilities appears in the published contract, which covers only downstream
+  billing artifacts (invoices, service charges, payments) and enterprise user provisioning (SCIM).
+  Two independent community MCP servers were built by scraping the web app to reach the
+  profile/mission surface, and a small industry of third-party scrapers (Apify actors, Parse.bot
+  endpoints) sells Malt profile and search data. That is the divergence worth recording: the
+  demand is on the marketplace core, and the contract is on the back office.

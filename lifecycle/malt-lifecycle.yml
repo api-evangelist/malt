@@ -1,0 +1,95 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://api.malt.com/ (API guidelines), https://status.malt.com/,
+  openapi/malt-exposed-apis-openapi.yml
+note: >-
+  Malt runs a public status page but publishes NO API lifecycle policy of any kind. There is no
+  versioning policy, no deprecation policy, no sunset commitment, no SLA and no changelog for the
+  API. The only version signal in the whole surface is the SCIM path segment /scim/v2/, which is
+  mandated by RFC 7644 rather than chosen by Malt, and the OpenAPI document's own info.version,
+  which reads "0.0.1". The /freelancer/* endpoints are entirely unversioned, so there is no
+  mechanism by which Malt could introduce a breaking change without breaking live callers.
+versioning:
+  scheme: none
+  current: null
+  docs: null
+  spec_info_version: 0.0.1
+  scim_path_version: v2
+  scim_note: >-
+    /scim/v2/ is the SCIM 2.0 protocol version required by RFC 7644, not evidence of a Malt
+    versioning scheme.
+  freelancer_surface_versioned: false
+  finding: >-
+    A published document whose info.version is 0.0.1, describing endpoints in production behind a
+    credential wall, is a signal in itself: the contract is treated as pre-release even though the
+    API is live.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: unknown
+  deprecation_header: unknown
+  rfc8594: unknown
+  finding: >-
+    No deprecation policy page, no Sunset/Deprecation header documentation, no advance-notice
+    commitment. Not testable without credentials. No `Deprecation` pointer is emitted in apis.yml.
+deprecated_operations: []
+deprecated_operations_note: 'No operation in the OpenAPI carries `deprecated: true`.'
+sla:
+  url: null
+  uptime_target: null
+  published: false
+  finding: >-
+    No API SLA is published. Commercial SLAs may exist inside Enterprise contracts — the pricing
+    page names "custom contracts" at that tier — but nothing is public.
+status_page:
+  url: https://status.malt.com/
+  provider: StatusCake
+  kind: public uptime report
+  http_status: 403
+  http_status_note: >-
+    status.malt.com sits behind the same Cloudflare bot challenge as www.malt.com and answers 403
+    to a plain client; it resolves and renders for a browser-shaped fetch, which is how it was
+    confirmed as a StatusCake public report for Malt.
+  rss: null
+  api: null
+  finding: >-
+    The status page is a StatusCake public uptime report rather than a full incident-communication
+    surface. No RSS/Atom feed, no status API endpoint, and no per-component breakdown was
+    exposed, so a machine cannot subscribe to Malt's availability — only a human can look at it.
+    It is also unclear whether api.malt.com is among the monitored endpoints.
+changelog:
+  url: null
+  published: false
+  finding: >-
+    No API changelog exists. api.malt.com serves only the docs shell, the spec list
+    (specSummary.json) and the unified spec; there is no dated release-note surface. The unified
+    spec was last modified 2026-01-07 per the last-modified header on api.malt.com. Malt's
+    engineering blog (blog.malt.engineering, on Medium) and newsroom.malt.com carry company and
+    engineering writing, not API release notes. No `ChangeLog` pointer is emitted.
+  spec_last_modified: '2026-01-07'
+  spec_last_modified_source: last-modified header on https://api.malt.com/
+support:
+  channels:
+  - kind: help-center
+    url: https://help.malt.com/kb/en/
+    note: Redirects to a Zendesk instance (help.malt.com/hc/en-150); bot-challenged to non-browsers.
+  - kind: api-access-request
+    url: https://api.malt.com/
+    note: >-
+      The API guidelines route API access and technical questions to "your Malt representative"
+      and "the standard Malt support channels" — there is no developer support address, forum,
+      Slack/Discord community or issue tracker for the API.
+  - kind: documentation-issues
+    note: >-
+      The guidelines instruct readers to "create an issue in the internal documentation
+      repository" — an instruction aimed at Malt employees that has been published on a public
+      docs site. A external developer has no such repository to file against.
+evidence:
+- url: https://api.malt.com/
+  status: 200
+- url: https://api.malt.com/unified-exposed-apis.json
+  status: 200
+- url: https://status.malt.com/
+  status: 403
+  note: Cloudflare challenge to non-browser client; confirmed as a StatusCake public report via browser-shaped fetch.

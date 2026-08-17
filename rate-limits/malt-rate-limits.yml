@@ -1,0 +1,57 @@
+generated: '2026-08-17'
+method: probed
+source: >-
+  https://api.malt.com/ (the "Malt - API Guidelines" OpenAPI info.description) plus live
+  unauthenticated requests to https://api.malt.com/freelancer/invoices and
+  https://api.malt.com/scim/v2/Users
+limit_count: 0
+note: >-
+  Malt publishes NO numeric rate limits. The API documentation's own getting-started list tells a
+  developer they will need to "understand the usage limits and best practices" under a heading
+  called "Rate Limiting Guidelines" — but no such section exists anywhere in the published
+  document. There is no requests-per-second, per-minute or per-day figure, no burst allowance, no
+  per-key or per-account quota, and no documented 429 behaviour. Live unauthenticated requests to
+  both halves of the surface return HTTP 401 with an empty body and carry NO rate-limit headers of
+  any family — no X-RateLimit-*, no RFC 9239-style RateLimit-*, no Retry-After. Recorded as
+  limit_count: 0: an honest zero, not an unchecked field. This is the clearest single gap on
+  Malt's API surface — the docs promise a limits section and then do not ship one, so an agent or
+  integration has no way to pace itself except by observing failures.
+limits: []
+headers:
+  observed: []
+  documented: []
+  note: >-
+    No rate-limit signalling observed on any live response. Response headers on the 401 are
+    security/infra only (strict-transport-security, x-content-type-options, x-frame-options,
+    x-xss-protection, permissions-policy) plus Cloudflare and Malt session cookies.
+exhaustion:
+  status_code: null
+  retry_after: null
+  body: null
+  note: Undocumented and not observable without credentials.
+scopes_checked:
+- scope: per-key
+  documented: false
+- scope: per-account
+  documented: false
+- scope: per-endpoint
+  documented: false
+- scope: per-ip
+  documented: false
+evidence:
+- url: https://api.malt.com/
+  status: 200
+  note: >-
+    Stoplight Elements docs portal; the unified OpenAPI it renders
+    (https://api.malt.com/unified-exposed-apis.json) names "Rate Limiting Guidelines" in its
+    getting-started list but contains no limits section, no x-ratelimit extension, and no
+    429 response on any of its 13 operations.
+- url: https://api.malt.com/unified-exposed-apis.json
+  status: 200
+  note: OpenAPI 3.0.3, 13 operations, zero 429 responses declared.
+- url: https://api.malt.com/freelancer/invoices?since=2026-01-01
+  status: 401
+  note: Empty body, no rate-limit headers present.
+- url: https://api.malt.com/scim/v2/Users
+  status: 401
+  note: Empty body, no rate-limit headers present.

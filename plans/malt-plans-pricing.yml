@@ -1,0 +1,80 @@
+generated: '2026-08-17'
+method: searched
+source: https://www.malt.com/c/pricing
+plan_count: 3
+currency: null
+billing_period: null
+note: >-
+  Malt names three company-side plans on its pricing page and attaches a feature list to each,
+  but publishes NO price for any of them — every tier reads "On demand" and routes the buyer to a
+  contact form or a demo request. There is no self-serve price, no listed commission or service-fee
+  percentage, and no published overage schedule. The page states the platform is free for
+  freelancers, but does not state the service charge Malt deducts from freelancer earnings (the
+  API exposes those deductions as "fee invoices" / service charge invoices via
+  GET /freelancer/fee-invoices, so the mechanism is documented even though the rate is not).
+  Recorded as plan_count: 3 with null prices — the tiers are real and published; the amounts are
+  not. API access is not a pricing-page line item on any tier.
+api_access_in_plans: false
+api_access_note: >-
+  None of the three tiers mentions API access. The API documentation says freelancer tokens are
+  self-served from My Account > API Keys, while client team and organization tokens come "from
+  your Malt representative" — so the enterprise half of the API surface (SCIM provisioning) is
+  effectively sales-gated rather than plan-gated.
+plans:
+- name: Starter
+  price: null
+  price_display: On demand
+  currency: null
+  billing_period: null
+  audience: companies
+  included:
+  - Limited marketplace access
+  - Automated invoicing, expenses and payments
+  - Email support
+  - AI Search
+  limits:
+    marketplace_access: limited
+- name: Advanced
+  price: null
+  price_display: On demand
+  currency: null
+  billing_period: null
+  audience: companies
+  included:
+  - Everything in Starter
+  - Unlimited marketplace access
+  - Up to 30-day invoice payment (subject to eligibility)
+  - Accelerated freelancer payments
+  - Malt Open access
+  - Malt Strategy consultants (subject to fees)
+  limits:
+    marketplace_access: unlimited
+    invoice_payment_terms: up to 30 days, eligibility-dependent
+- name: Enterprise
+  price: null
+  price_display: On demand
+  currency: null
+  billing_period: null
+  audience: companies
+  included:
+  - Everything in Advanced
+  - 30-day invoice payment
+  - Advanced analytics
+  - 85+ ERP integrations
+  - Custom contracts
+  limits:
+    invoice_payment_terms: 30 days
+    integrations: 85+ ERP / procurement / HR systems
+freelancer_side:
+  price_display: Free to join and use
+  service_charge: not published
+  note: >-
+    Malt markets the platform as free for freelancers. A service charge is deducted from
+    freelancer earnings — the API models it as a first-class object (fee invoices / service charge
+    invoices) — but the rate is not stated on the pricing page.
+evidence:
+- url: https://www.malt.com/c/pricing
+  status: 200
+  fetched: '2026-08-17'
+  note: >-
+    Served 403 to a plain curl behind Cloudflare; read successfully with a browser-shaped fetch.

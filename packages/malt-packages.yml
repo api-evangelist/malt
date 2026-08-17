@@ -1,0 +1,126 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  registry.npmjs.org (search + per-package metadata endpoints), pypi.org/pypi/<name>/json,
+  api.github.com/orgs/Maltcommunity, plus the Malt API documentation at https://api.malt.com/
+note: >-
+  IMPORTANT FINDING — Malt publishes NO first-party API client library in any language. The
+  api.malt.com documentation offers only raw cURL and fetch() examples; there is no SDK link,
+  no code-generation download, and no `malt` / `@malt/*` client package on npm, PyPI, RubyGems,
+  Maven Central, NuGet, crates.io or pkg.go.dev. The packages recorded below ARE first-party
+  Malt code — the `@maltjoy` design system, published under the `@malt` npm scope by Malt
+  engineers (maintainers `malt-ops`, `achilleguillon_malt`, `preynaudmalt`, `victorgarciamalt`,
+  `kevin_carnaille`) from gitlab.com/maltcommunity/apps/design-system — but they are UI/design
+  packages, not clients for the Malt API. No `SDKs` pointer is emitted in apis.yml for that
+  reason: crediting a CSS/token library as an API SDK would misstate what a developer gets.
+  Registry versions and dates below are read from registry.npmjs.org metadata.
+api_client_libraries:
+  count: 0
+  languages: []
+  finding: >-
+    A consumer of the Malt Exposed APIs writes their own HTTP client. For the SCIM 2.0 half of
+    the surface this matters less — any standards-compliant SCIM client library works against
+    /scim/v2/Users — but the freelancer billing endpoints have no generated or hand-written
+    client of any kind.
+  searched_registries:
+  - npm
+  - pypi
+  - rubygems
+  - maven-central
+  - nuget
+  - crates.io
+  - pkg.go.dev
+  - packagist
+packages:
+- language: javascript
+  registry: npm
+  name: "@maltjoy/core"
+  url: https://www.npmjs.com/package/@maltjoy/core
+  install: npm install @maltjoy/core
+  official: true
+  kind: design-system
+  api_client: false
+  version: 5.12.0
+  published: '2026-01-21'
+  repository: https://gitlab.com/maltcommunity/apps/design-system
+  description: Design system library by @malt — Stencil-built web components.
+  keywords:
+  - design-system
+  - stencil
+  - typescript
+- language: javascript
+  registry: npm
+  name: "@maltjoy/css"
+  url: https://www.npmjs.com/package/@maltjoy/css
+  install: npm install @maltjoy/css
+  official: true
+  kind: design-system
+  api_client: false
+  version: 5.20.0
+  published: '2026-05-06'
+  description: Malt design system CSS framework for tokens.
+- language: javascript
+  registry: npm
+  name: "@maltjoy/icons"
+  url: https://www.npmjs.com/package/@maltjoy/icons
+  install: npm install @maltjoy/icons
+  official: true
+  kind: design-system
+  api_client: false
+  version: 6.0.1
+  published: '2026-07-13'
+  description: Malt design system icons.
+- language: javascript
+  registry: npm
+  name: "@maltjoy/themes"
+  url: https://www.npmjs.com/package/@maltjoy/themes
+  install: npm install @maltjoy/themes
+  official: true
+  kind: design-system
+  api_client: false
+  version: 6.0.1
+  published: '2026-07-13'
+  description: Malt design system themes modules based on tokens.
+- language: javascript
+  registry: npm
+  name: "@maltjoy/layout"
+  url: https://www.npmjs.com/package/@maltjoy/layout
+  install: npm install @maltjoy/layout
+  official: true
+  kind: design-system
+  api_client: false
+  version: 5.12.0
+  published: '2026-01-21'
+  description: Malt design system layout ecosystem.
+- language: javascript
+  registry: npm
+  name: ccsss
+  url: https://www.npmjs.com/package/ccsss
+  install: npm install ccsss
+  official: true
+  kind: infrastructure-tool
+  api_client: false
+  version: 1.1.3
+  published: '2020-04-15'
+  repository: https://github.com/Maltcommunity/ccsss
+  description: >-
+    Critical-path CSS service. The only public repository in Malt's GitHub organization
+    (github.com/Maltcommunity). Last npm release 2020-04-15, last repo push 2025-08-05 —
+    effectively dormant. Not related to the Malt API.
+rejected:
+- name: malt
+  registry: npm
+  reason: Unrelated 2012 package ("realtime model for beanpole"), not Malt the company.
+  version: 0.0.17
+  published: '2012-03-08'
+- name: malt
+  registry: pypi
+  reason: Unrelated project ("auditable automation toolkit", author Anthony Towns).
+  version: 0.0.1
+- name: malt-mcp
+  registry: github
+  reason: >-
+    Third-party, community-built MCP servers (LeoMbm/malt-mcp and the JLMael fork) that drive the
+    Malt web app by browser automation and DOM scraping. Not published by Malt, and their own
+    READMEs warn that automated profile edits may violate Malt's terms of service. Recorded in
+    mcp/malt-mcp.yml as third-party, never as a Malt package.

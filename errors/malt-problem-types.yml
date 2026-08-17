@@ -1,0 +1,150 @@
+generated: '2026-08-17'
+method: derived
+source: >-
+  openapi/malt-exposed-apis-openapi.yml (4xx/5xx responses on all 13 operations) enriched from the
+  authentication error examples published in the "Malt - API Guidelines" info.description at
+  https://api.malt.com/
+format: spring-boot-error-map
+rfc9457: false
+note: >-
+  Malt publishes no error reference page and no error-code registry. This catalog is derived from
+  the 4xx responses declared on each operation in the OpenAPI plus the two worked examples (401,
+  403) in the API guidelines prose. Three findings matter for anyone integrating.
+  (1) Not one 4xx response in the spec declares a response body — every error response has a
+  description string and an empty `content`, so a generated client gets no error type at all.
+  (2) An `ErrorResponse` schema IS defined in components.schemas but no operation references it;
+  it is dead weight in the document.
+  (3) Live behaviour is thinner than the docs: an unauthenticated request to either surface
+  returns 401 with content-length: 0, so the documented timestamp/status/error/path envelope did
+  not materialise on the wire. There are no application-level error codes anywhere — a client
+  discriminates failures by HTTP status alone.
+envelope:
+  documented_shape:
+    timestamp: string (ISO-8601 with offset)
+    status: integer (HTTP status)
+    error: string (HTTP reason phrase)
+    path: string (request path)
+  observed_on_401: empty body (content-length 0)
+  machine_readable_code: false
+  message_field: false
+  remediation_field: false
+  unreferenced_schema: ErrorResponse
+problems:
+- status: 400
+  title: Bad request - invalid date format
+  cause: >-
+    The `since` or `until` query parameter is not a parseable date. `since` is required on all
+    three list operations.
+  remediation: Send ISO-formatted dates; `since` must be present.
+  body: undeclared
+  source_operations:
+  - openapi/malt-exposed-apis-openapi.yml#findInvoices
+  - openapi/malt-exposed-apis-openapi.yml#findPayments
+  - openapi/malt-exposed-apis-openapi.yml#findFeeInvoices
+- status: 401
+  title: Unauthorized - invalid or missing authentication
+  cause: The Authorization header is missing, malformed, expired or revoked.
+  remediation: >-
+    Send `Authorization: <token>` (bare token, per the guidelines — not `Bearer <token>`). Regenerate
+    the token at https://www.malt.com/account/tokens if it was rotated; tokens are shown once.
+  body: undeclared in spec; documented example is the Spring error map; observed live as empty.
+  documented_example: |
+    {
+       "timestamp": "1970-01-01T00:00:00.000+00:00",
+       "status": 401,
+       "error": "Unauthorized",
+       "path": "/exposed/endpoint"
+    }
+  observed:
+    url: https://api.malt.com/freelancer/invoices?since=2026-01-01
+    http_status: 401
+    content_length: 0
+    fetched: '2026-08-17'
+  source_operations:
+  - openapi/malt-exposed-apis-openapi.yml#findInvoices
+  - openapi/malt-exposed-apis-openapi.yml#getInvoice
+  - openapi/malt-exposed-apis-openapi.yml#getInvoicePdf
+  - openapi/malt-exposed-apis-openapi.yml#findPayments
+  - openapi/malt-exposed-apis-openapi.yml#findFeeInvoices
+  - openapi/malt-exposed-apis-openapi.yml#getFeeInvoice
+  - openapi/malt-exposed-apis-openapi.yml#getFeeInvoicePdf
+- status: 403
+  title: Forbidden - insufficient permissions
+  cause: >-
+    The token is valid but its identity or permission scopes do not cover the requested resource.
+    Because Malt's model is identity-based (freelancer / client team / organization token), a
+    403 commonly means the wrong TOKEN TYPE was used rather than a missing scope.
+  remediation: >-
+    Confirm the token type matches the surface — freelancer tokens for /freelancer/*, organization
+    tokens for /scim/v2/* — and that the required permission scopes were selected when the token
+    was created.
+  body: undeclared in spec; documented example is the Spring error map.
+  documented_example: |
+    {
+       "timestamp": "1970-01-01T00:00:00.000+00:00",
+       "status": 403,
+       "error": "Forbidden",
+       "path": "/exposed/endpoint"
+    }
+  source_operations:
+  - openapi/malt-exposed-apis-openapi.yml#findInvoices
+  - openapi/malt-exposed-apis-openapi.yml#getInvoice
+  - openapi/malt-exposed-apis-openapi.yml#getInvoicePdf
+  - openapi/malt-exposed-apis-openapi.yml#findPayments
+  - openapi/malt-exposed-apis-openapi.yml#findFeeInvoices
+  - openapi/malt-exposed-apis-openapi.yml#getFeeInvoice
+  - openapi/malt-exposed-apis-openapi.yml#getFeeInvoicePdf
+- status: 403
+  title: Deletion forbidden
+  cause: >-
+    A SCIM user cannot be deleted — the spec's description notes this happens "for instance
+    because the user has activity" on the platform.
+  remediation: >-
+    Deactivate instead of deleting: PATCH /scim/v2/Users/{userId} setting `active` to false, which
+    is the only PATCH operation Malt currently accepts.
+  body: undeclared
+  source_operations:
+  - openapi/malt-exposed-apis-openapi.yml#deleteUser
+- status: 404
+  title: Invoice not found
+  cause: No invoice exists with the supplied id, or it belongs to another identity.
+  remediation: >-
+    Confirm the id came from a findInvoices / findFeeInvoices response for the same token. Note
+    Malt does not distinguish "does not exist" from "not yours" — both surface as 404.
+  body: undeclared
+  source_operations:
+  - openapi/malt-exposed-apis-openapi.yml#getInvoice
+  - openapi/malt-exposed-apis-openapi.yml#getInvoicePdf
+  - openapi/malt-exposed-apis-openapi.yml#getFeeInvoice
+  - openapi/malt-exposed-apis-openapi.yml#getFeeInvoicePdf
+- status: 404
+  title: No user exists with the provided ID
+  cause: The SCIM user id is unknown to Malt.
+  remediation: Resolve the id via GET /scim/v2/Users with a SCIM `filter` before addressing it directly.
+  body: undeclared
+  source_operations:
+  - openapi/malt-exposed-apis-openapi.yml#getUserById
+  - openapi/malt-exposed-apis-openapi.yml#modifyUser
+  - openapi/malt-exposed-apis-openapi.yml#replaceUser
+gaps:
+- kind: no-429
+  detail: >-
+    No operation declares a 429 response, and no rate-limit headers are returned, despite the
+    guidelines promising a rate-limiting section. A client cannot handle throttling deliberately.
+- kind: no-5xx
+  detail: >-
+    No operation declares any 5xx response. A generated client has no typed path for a server
+    failure.
+- kind: no-error-bodies
+  detail: >-
+    All 15 declared 4xx responses have empty `content`. Error handling must be written against
+    status codes and prose, not against the contract.
+- kind: no-scim-error-shape
+  detail: >-
+    SCIM 2.0 defines its own error response format (schemas urn:ietf:params:scim:api:messages:2.0:Error
+    with scimType/detail/status). Malt's SCIM operations declare no error bodies at all, so the
+    SCIM error contract a standards-conformant client expects is not published.
+- kind: no-error-codes
+  detail: >-
+    There is no application error code namespace of any kind — no string codes, no numeric
+    registry, no error reference page.

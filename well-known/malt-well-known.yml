@@ -1,0 +1,89 @@
+generated: '2026-08-17'
+method: searched
+source: live probes of the /.well-known/ surface on every Malt host in apis.yml + OpenAPI servers[]
+note: >-
+  api.malt.com serves a real RFC 9116 security.txt (200, text/plain) pointing at Malt's Yogosha
+  Vulnerability Disclosure Program, plus an EFF Do Not Track compliance policy. Both are saved
+  verbatim. Every other /.well-known/ path probed returns 404 on api.malt.com. The www.malt.com
+  and www.malt.fr hosts sit behind a Cloudflare bot challenge that answers 403 to a non-browser
+  client on every path, so those probes are recorded as inconclusive rather than as absences —
+  except /.well-known/agent-card.json and /.well-known/agent.json, which returned a definitive
+  404 through a browser-shaped fetch. The security.txt itself names malt.com and www.malt.com as
+  its Canonical locations, so Malt does intend the document to be served there too.
+hosts:
+- host: https://api.malt.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/plain
+    file: malt-security.txt
+  - path: /.well-known/dnt-policy.txt
+    status: 200
+    content_type: text/plain
+    file: malt-dnt-policy.txt
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/change-password
+    status: 404
+- host: https://www.malt.com
+  note: Cloudflare bot challenge returns 403 to non-browser clients on all paths; treated as inconclusive.
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+    result: inconclusive
+  - path: /.well-known/agent-card.json
+    status: 404
+    result: definitive
+    via: browser-shaped fetch
+  - path: /.well-known/agent.json
+    status: 404
+    result: definitive
+    via: browser-shaped fetch
+  - path: /.well-known/openid-configuration
+    status: 403
+    result: inconclusive
+  - path: /.well-known/oauth-authorization-server
+    status: 403
+    result: inconclusive
+  - path: /.well-known/api-catalog
+    status: 403
+    result: inconclusive
+  - path: /.well-known/ai-plugin.json
+    status: 403
+    result: inconclusive
+- host: https://www.malt.fr
+  note: Same Cloudflare challenge as www.malt.com.
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+    result: inconclusive
+security_txt:
+  file: malt-security.txt
+  source: https://api.malt.com/.well-known/security.txt
+  contact:
+  - https://app.yogosha.com/cvd/malt/rqtSc4eIMUj7CKFhA87hI
+  preferred_languages:
+  - en
+  - fr
+  hiring: https://careers.malt.com/
+  canonical:
+  - https://malt.com/.well-known/security.txt
+  - https://www.malt.com/.well-known/security.txt
+  expires: '2026-03-15T23:59:59Z'
+  x-finding: >-
+    The Expires field is 2026-03-15, which is in the past as of this probe (2026-08-17). RFC 9116
+    section 2.5.5 says a security.txt whose Expires date has passed SHOULD be considered stale and
+    MUST NOT be used. The document is live and the Yogosha VDP link resolves, but the file needs a
+    refreshed Expires value to be spec-valid. This is a one-line fix on Malt's side.

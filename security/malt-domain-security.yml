@@ -1,0 +1,22 @@
+generated: '2026-08-17'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: www.malt.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 20 13:50:21 2026 GMT
+  hsts: null
+- host: api.malt.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 21 00:44:51 2026 GMT
+  hsts: true
+  hsts_max_age: 315360000
+domains:
+- domain: malt.com
+  dnssec: false
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: reject

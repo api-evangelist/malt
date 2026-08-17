@@ -1,0 +1,150 @@
+generated: '2026-08-17'
+method: derived
+status: candidate
+source: openapi/malt-exposed-apis-openapi.yml
+note: >-
+  Malt ships NO MCP server. There is no hosted endpoint, no first-party stdio package, and no
+  mention of MCP, agents or tools anywhere in the API guidelines at api.malt.com. Probes for
+  https://api.malt.com/mcp return 404 and no mcp.malt.com host exists. The tools below are a
+  CANDIDATE surface derived one-to-one from the 13 operations in Malt's published OpenAPI — they
+  describe what an MCP server over this API would expose, not something a client can call today.
+  Third-party community servers DO exist (see third_party below) but they are not Malt's, they
+  drive the web app by browser automation rather than the documented API, and their own authors
+  warn they may violate Malt's terms of service — so they are recorded as context and are not the
+  subject of this manifest.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: derived
+  probes:
+  - url: https://api.malt.com/mcp
+    status: 404
+  - url: https://mcp.malt.com/
+    status: 000
+    note: Host does not resolve.
+  - url: https://api.malt.com/.well-known/oauth-authorization-server
+    status: 404
+  - url: https://api.malt.com/.well-known/oauth-protected-resource
+    status: 404
+server:
+  name: malt
+  transport: null
+  url: null
+  auth:
+    style: opaque token in the Authorization header
+    note: >-
+      An MCP server over this API would need to carry a Malt identity token. Freelancer tokens are
+      self-served; client team and organization tokens require a Malt representative, so an
+      agent-facing deployment of the SCIM half would be sales-gated.
+tools:
+- name: find_invoices
+  description: List a freelancer's invoices issued within a date range.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#findInvoices
+  input_schema_source: parameters since (required, date), until (optional, date)
+  read_only: true
+- name: get_invoice
+  description: Retrieve a single invoice by its id.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#getInvoice
+  input_schema_source: path parameter id (required, string)
+  read_only: true
+- name: get_invoice_pdf
+  description: Retrieve an invoice as a base64-encoded PDF document.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#getInvoicePdf
+  input_schema_source: path parameter id (required, string)
+  read_only: true
+- name: find_payments
+  description: List payments received within a date range, each with the invoices it settles.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#findPayments
+  input_schema_source: parameters since (required, date), until (optional, date)
+  read_only: true
+- name: find_fee_invoices
+  description: List Malt service charge (fee) invoices within a date range.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#findFeeInvoices
+  input_schema_source: parameters since (required, date), until (optional, date)
+  read_only: true
+- name: get_fee_invoice
+  description: Retrieve a single service charge invoice by its id.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#getFeeInvoice
+  input_schema_source: path parameter id (required, string)
+  read_only: true
+- name: get_fee_invoice_pdf
+  description: Retrieve a service charge invoice as a base64-encoded PDF document.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#getFeeInvoicePdf
+  input_schema_source: path parameter id (required, string)
+  read_only: true
+- name: find_users
+  description: Query provisioned users with a SCIM filter and index pagination.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#findUsers
+  input_schema_source: parameters filter (SCIM filter grammar), startIndex (1-based), count
+  read_only: true
+- name: get_user
+  description: Fetch a provisioned user by SCIM id.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#getUserById
+  input_schema_source: path parameter userId (required, string)
+  read_only: true
+- name: create_user
+  description: Provision a new user on the organization's Malt account.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#createUser
+  input_schema_source: requestBody SubmittedUserResource (userName + name required)
+  read_only: false
+  agent_caution: >-
+    No idempotency key exists on this operation. A retried call after a timeout can create a
+    duplicate user. An agent must confirm via find_users before retrying.
+- name: replace_user
+  description: Replace a provisioned user's attributes wholesale.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#replaceUser
+  input_schema_source: path parameter userId + requestBody SubmittedUserResource
+  read_only: false
+- name: deactivate_user
+  description: Deactivate a provisioned user via a SCIM PATCH operation document.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#modifyUser
+  input_schema_source: path parameter userId + requestBody UserPatchBody
+  read_only: false
+  note: >-
+    Malt's own operation summary limits PATCH to setting `active` to false. Naming the candidate
+    tool "deactivate_user" rather than "modify_user" reflects what the API actually accepts.
+- name: delete_user
+  description: Delete a provisioned user.
+  source_operation: openapi/malt-exposed-apis-openapi.yml#deleteUser
+  input_schema_source: path parameter userId (required, string)
+  read_only: false
+  agent_caution: >-
+    Destructive and frequently refused — Malt returns 403 when the user has platform activity.
+    Deactivation via deactivate_user is the supported path.
+coverage:
+  rest_operations: 13
+  candidate_tools: 13
+  read_only_tools: 9
+  write_tools: 4
+third_party:
+  note: >-
+    Recorded for completeness. NOT Malt-published, NOT wired into apis.yml, and NOT the basis of
+    any artifact in this repo.
+  servers:
+  - name: malt-mcp
+    author: LeoMbm
+    license: Apache-2.0
+    kind: community
+    transport: local-stdio
+    mechanism: >-
+      Browser automation and DOM scraping of the Malt web app, with some read tools calling Malt's
+      internal (undocumented) REST endpoints — not the documented api.malt.com surface.
+    directories:
+    - https://www.pulsemcp.com/servers/leombm-malt
+    caution: >-
+      Reads and WRITES freelancer profile data (headline, bio, daily rate, skills). The project's
+      own documentation warns that automated profile edits may violate Malt's terms of service.
+  - name: Malt-MCP
+    author: JLMael
+    kind: community-fork
+    upstream: LeoMbm/malt-mcp
+    directories:
+    - https://glama.ai/mcp/servers/JLMael/Malt-MCP
+  finding: >-
+    The existence of two independent community MCP servers built by scraping — for a platform
+    whose documented API exposes only invoices, payments and SCIM — is a demand signal. What
+    agents want from Malt (profiles, missions, availability, offers) is exactly what the public
+    API does not expose.

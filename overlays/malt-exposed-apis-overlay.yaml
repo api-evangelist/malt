@@ -1,0 +1,116 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Malt Exposed APIs
+  version: 1.0.0
+extends: openapi/malt-exposed-apis-openapi.yml
+x-generated: '2026-08-17'
+x-method: generated
+x-source: >-
+  Derived from the artifacts in this repository against the verbatim spec at
+  openapi/_original/malt-unified-exposed-apis-openapi.json (fetched from
+  https://api.malt.com/unified-exposed-apis.json). The original document is never mutated.
+actions:
+- target: $.info
+  update:
+    x-apievangelist-profile: https://apis.io/provider/malt
+    x-apievangelist-reviewed: '2026-08-17'
+    x-apievangelist-note: >-
+      Two disjoint capability groups on one host: a bespoke read-only freelancer billing surface
+      and a standards-conformant SCIM 2.0 user-provisioning surface. A client needs two sets of
+      conventions.
+    x-apievangelist-findings:
+    - >-
+      Global `security` is an empty array and the seven /freelancer/* operations declare no
+      security requirement, although the guidelines state that all APIs require a token. Only the
+      six SCIM operations reference ApiKeyAuth.
+    - >-
+      The declared BearerAuth (http/bearer, JWT) scheme is never applied to any operation, and the
+      prose documents a BARE token (`Authorization: your-api-token-here`) rather than a
+      `Bearer ` prefix. The two disagree.
+    - >-
+      info.version is 0.0.1 on a document describing a live production API.
+    - >-
+      No 4xx response declares a body; no 5xx response is declared anywhere; no 429 exists even
+      though the guidelines promise a rate-limiting section.
+    - >-
+      The ErrorResponse schema (SCIM-shaped: schemas/scimType/status/detail) is defined and
+      referenced by nothing.
+    - >-
+      The PageResource paging envelope is defined but only used by the SCIM surface; the three
+      billing list operations return unpaged arrays.
+    - >-
+      The three SCIM write operations declare requestBody content as `*/*` rather than
+      application/json or application/scim+json.
+- target: $.servers
+  update:
+  - url: https://api.malt.com
+    description: Production API server
+    x-apievangelist-verified: '2026-08-17'
+    x-apievangelist-probe: >-
+      GET /freelancer/invoices?since=2026-01-01 and GET /scim/v2/Users both returned HTTP 401 with
+      an empty body, confirming both surfaces are live and credential-gated at this host.
+- target: $.paths['/freelancer/invoices'].get
+  update:
+    x-apievangelist-note: >-
+      Unpaged. Returns the full result set for the date window; a wide `since` on a long history
+      returns one unbounded response. No cursor, page, offset or limit parameter exists.
+- target: $.paths['/freelancer/invoices/{id}/pdf'].get
+  update:
+    x-apievangelist-note: >-
+      Despite the name, the 200 response is application/json returning PDFInvoiceResource with the
+      document base64-encoded in a `pdf` field — not a binary application/pdf stream.
+- target: $.paths['/freelancer/fee-invoices'].get
+  update:
+    x-apievangelist-note: >-
+      Filters on since/until, but the FeeInvoiceResource it returns carries NO date field at all —
+      the attribute the query filters on is not present in the response.
+- target: $.paths['/freelancer/payments'].get
+  update:
+    x-apievangelist-note: >-
+      PaymentResource carries an id but there is no GET /freelancer/payments/{id}, so a payment is
+      list-only and its id cannot be re-resolved.
+- target: $.paths['/scim/v2/Users'].post
+  update:
+    x-apievangelist-note: >-
+      No idempotency key. A retry after a network timeout can create a duplicate user. Confirm via
+      GET /scim/v2/Users with a `filter` on userName before retrying.
+    x-apievangelist-idempotent: false
+- target: $.paths['/scim/v2/Users/{userId}'].patch
+  update:
+    x-apievangelist-note: >-
+      Malt accepts only one PATCH operation — setting `active` to false. Treat this endpoint as
+      "deactivate user", not as general SCIM PATCH.
+- target: $.paths['/scim/v2/Users/{userId}'].delete
+  update:
+    x-apievangelist-note: >-
+      Returns 403 when the user has platform activity. Deactivation via PATCH is the supported
+      path for offboarding.
+- target: $.components.schemas.InvoiceResource
+  update:
+    x-apievangelist-note: >-
+      Carries no currency field. Amounts are unlabelled in the contract; currency appears only on
+      PaymentResource.
+- target: $.components.schemas.CustomerResource
+  update:
+    x-apievangelist-note: >-
+      Inline value object with no `id` and no operations — customers cannot be listed, fetched or
+      joined except by matching name / registrationNumber / vatNumber strings.
+- target: $.components.schemas.SupplierResource
+  update:
+    x-apievangelist-note: >-
+      Same shape and same limitation as CustomerResource; one party schema reused for both sides of
+      the transaction.
+- target: $.components.schemas.MaltUserExtension
+  update:
+    x-apievangelist-note: >-
+      The single Malt-specific SCIM attribute (urn:ietf:params:scim:schemas:extension:malt:2.0:User).
+      companyAttributionId ties a provisioned user to the buying company's cost-attribution scheme.
+- target: $.components.schemas.ErrorResponse
+  update:
+    x-apievangelist-note: >-
+      Orphaned. SCIM-shaped error object referenced by no operation; every declared 4xx has empty
+      content.
+- target: $.components.schemas.PageResource
+  update:
+    x-apievangelist-note: >-
+      Used only by the SCIM ListResponse (UserPage). The billing list operations never reference it.

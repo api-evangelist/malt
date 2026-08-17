@@ -1,0 +1,161 @@
+generated: '2026-08-17'
+method: derived
+source: >-
+  openapi/malt-exposed-apis-openapi.yml, https://api.malt.com/ (API guidelines),
+  https://www.malt.com/about/privacy, well-known/malt-security.txt
+note: >-
+  Malt's headline conformance claim is SCIM 2.0. The /scim/v2/Users surface is a genuine RFC
+  7643/7644 implementation — SCIM paths, the ListResponse/UserPage envelope, 1-based startIndex
+  pagination, SCIM filter grammar, PATCH operation documents, application/scim+json content
+  negotiation, the standard `meta` object, and a declared SCIM extension schema
+  (MaltUserExtension). That is what lets an enterprise wire Malt into Okta/Entra provisioning.
+  Everything else in the cross-cutting column is absent: no OAuth 2.0, no OIDC, no RFC 9457
+  problem details, no idempotency contract, no rate-limit signalling. Malt publishes NO security
+  or compliance certifications — no SOC 2, no ISO 27001, no trust center — so no `Compliance`
+  pointer is emitted; its privacy center covers GDPR posture in prose (DPO contact, processing
+  register, DPIA procedures) without naming a single certification.
+standards:
+- id: scim-2.0
+  name: SCIM 2.0 (RFC 7643 / RFC 7644)
+  conforms: true
+  confidence: high
+  evidence: >-
+    Six operations under /scim/v2/Users (findUsers, createUser, getUserById, replaceUser,
+    modifyUser, deleteUser). Response media types include application/scim+json. Schemas
+    ScimEntity (with the standard `meta` object), UserResource, SubmittedUserResource, UserPage
+    (ListResponse), UserPatchBody (PATCH Operations array) and MaltUserExtension (a SCIM
+    extension schema). Query parameters startIndex (1-based), count and filter follow RFC 7644
+    section 3.4.2.
+  partial:
+  - >-
+    PATCH is restricted: the operation summary states it "only accepts setting `active` to
+    `false` for now", so the full RFC 7644 PATCH surface is not implemented.
+  - >-
+    No /scim/v2/Groups resource — user provisioning only, no group/team sync.
+  - >-
+    No /scim/v2/ServiceProviderConfig, /Schemas or /ResourceTypes discovery endpoints, which
+    RFC 7644 section 4 defines and which many IdPs probe.
+  - >-
+    A SCIM-shaped ErrorResponse schema (schemas/scimType/status/detail, matching
+    urn:ietf:params:scim:api:messages:2.0:Error) IS defined in components.schemas, but no
+    operation references it — so the SCIM error contract is modelled and then never published on
+    any response.
+  - >-
+    The `attributes` / `excludedAttributes` sparse-fieldset parameters are not declared.
+- id: oauth2
+  name: OAuth 2.0
+  conforms: false
+  evidence: >-
+    No oauth2 security scheme in the spec. /.well-known/oauth-authorization-server and
+    /.well-known/oauth-protected-resource both 404 on api.malt.com. Authentication is a long-lived
+    opaque token in the Authorization header.
+- id: oidc
+  name: OpenID Connect
+  conforms: false
+  evidence: /.well-known/openid-configuration returns 404 on api.malt.com.
+- id: rfc9457-problem-details
+  name: RFC 9457 Problem Details for HTTP APIs
+  conforms: false
+  evidence: >-
+    The documented error body is the stock Spring Boot error map (timestamp/status/error/path),
+    not application/problem+json. No operation declares an error body at all.
+- id: rfc9116-security-txt
+  name: RFC 9116 security.txt
+  conforms: partial
+  evidence: >-
+    A real security.txt is served at https://api.malt.com/.well-known/security.txt with Contact,
+    Preferred-Languages, Hiring, Canonical and Expires fields, pointing at Malt's Yogosha
+    Coordinated Vulnerability Disclosure program.
+  deviation: >-
+    Expires is 2026-03-15, already past at time of probe (2026-08-17). RFC 9116 section 2.5.5
+    says such a file should be considered stale.
+- id: rfc8594-sunset-header
+  name: RFC 8594 Sunset HTTP header
+  conforms: false
+  evidence: No deprecation policy and no Sunset/Deprecation header documentation.
+- id: idempotency-keys
+  name: Idempotency keys (draft-ietf-httpapi-idempotency-key-header)
+  conforms: false
+  evidence: >-
+    No Idempotency-Key header or parameter anywhere in the spec. POST /scim/v2/Users has no
+    dedupe key.
+- id: rate-limit-headers
+  name: RateLimit header fields for HTTP
+  conforms: false
+  evidence: >-
+    No RateLimit-* or X-RateLimit-* headers observed on live responses; no limits published,
+    despite the guidelines naming a "Rate Limiting Guidelines" section that does not exist.
+- id: rfc7644-pagination
+  name: SCIM index-based pagination
+  conforms: true
+  evidence: startIndex (1-based) + count on GET /scim/v2/Users, returning a UserPage ListResponse.
+- id: pagination-freelancer-surface
+  name: Pagination on the freelancer billing surface
+  conforms: false
+  evidence: >-
+    findInvoices, findPayments and findFeeInvoices accept only a since/until date window and
+    return an unpaged array. A PageResource schema is defined in components but unreferenced.
+- id: json-api
+  name: JSON:API
+  conforms: false
+  evidence: Plain JSON resources; no JSON:API document structure.
+- id: odata
+  name: OData
+  conforms: false
+- id: openapi-3
+  name: OpenAPI 3.0.3
+  conforms: true
+  evidence: >-
+    A single unified OpenAPI 3.0.3 document is published at
+    https://api.malt.com/unified-exposed-apis.json and rendered with Stoplight Elements. All 13
+    operations carry unique operationIds, summaries and tags; four tags are declared with
+    descriptions; 22 component schemas are defined and reused.
+  deviation: >-
+    info.version is "0.0.1". Global `security` is an empty array and the seven freelancer
+    operations declare no security at all, even though the prose says all APIs require a token.
+    The three SCIM write operations declare requestBody content as `*/*` rather than a concrete
+    media type. No 4xx response declares a body, and no 5xx is declared anywhere.
+- id: asyncapi
+  name: AsyncAPI
+  conforms: false
+  evidence: >-
+    No AsyncAPI document and no publicly documented webhook or event catalog.
+    /asyncapi.yaml, /asyncapi.json, /webhooks and /events all 404 on api.malt.com. Malt markets
+    webhook capability as part of its enterprise integration story, but publishes no event
+    contract, so there is nothing to score and nothing to fabricate.
+- id: gdpr
+  name: GDPR
+  conforms: claimed
+  confidence: low
+  evidence: >-
+    Malt operates a privacy center (https://www.malt.com/about/privacy) describing a DPO contact,
+    a data-processing register, DPIA procedures and user access/rectification/erasure rights, and
+    a legal page (https://www.malt.com/legal) naming its financial and payment partners (Aria,
+    Defacto, Mangopay) and its Hiscox insurance cover. This is a stated GDPR posture in prose,
+    not a certification or an audited attestation.
+- id: soc2
+  name: SOC 2
+  conforms: false
+  evidence: >-
+    Not claimed anywhere on Malt's public surface. No trust center at trust.malt.com or
+    security.malt.com; /about/security returns 404.
+- id: iso-27001
+  name: ISO/IEC 27001
+  conforms: false
+  evidence: Not claimed anywhere on Malt's public surface.
+- id: pci-dss
+  name: PCI DSS
+  conforms: not-applicable
+  evidence: >-
+    Malt does not handle card data directly — payments are intermediated by Mangopay (a licensed
+    e-money institution) and financing partners Aria and Defacto, per https://www.malt.com/legal.
+    Compliance sits with those partners.
+compliance_program:
+  published: false
+  certifications: []
+  trust_center: null
+  finding: >-
+    No named certification is published anywhere on Malt's public surface. trust.malt.com does
+    not resolve; security.malt.com and www.malt.com/about/security return no security page
+    (403 challenge and 404 respectively). A buyer's security team has nothing to read except the
+    privacy center and the security.txt. No `Compliance` and no `TrustCenter` pointer emitted.

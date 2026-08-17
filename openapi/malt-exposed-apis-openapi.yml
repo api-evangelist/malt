@@ -1,0 +1,1083 @@
+openapi: 3.0.3
+info:
+  title: Malt - API Guidelines
+  version: 0.0.1
+  description: "# Table of contents\n\n1. [Overview](/#/#getting-started)\n2. [Authentication](/#/#api-token-types)\n\n\n\n\
+    ---\n\n# Overview\n\nWelcome to the Malt APIs documentation. This section provides comprehensive information about publicly\
+    \ accessible APIs.\n\n## Getting Started\n\nTo start using Malt's APIs, you'll need:\n\n1. **API Access Token** - Contact\
+    \ your Malt representative to obtain access credentials\n2. **API Documentation** - Browse the available endpoints using\
+    \ the API list on this site\n3. **Rate Limiting Guidelines** - Understand the usage limits and best practices\n\n## Authentication\n\
+    \nAll APIs require authentication using access tokens:\n\n```http\nAuthorization: your-api-token-here\n```\n\n## Support\n\
+    \nFor support with APIs:\n\n- **Documentation Issues**: Create an issue in the internal documentation repository\n- **API\
+    \ Access**: Contact your Malt representative\n- **Technical Support**: Use the standard Malt support channels\n\n---\n\
+    \n# [Authentication](/#authentication)\n\nThis guide explains how to authenticate with Malt's APIs.\n\n## API Token Types\n\
+    \nMalt provides different types of API tokens for different use cases:\n\n### Identity Based Tokens\n\nAPIs are accessible\
+    \ with a given identity based scope at malt.\n\n- Freelancer Account tokens\n- Client team token\n- Organization token\n\
+    \n## Obtaining an API Token\n\nTo request an API token:\n\n1. **Create an identity** in [signup page](https://www.malt.com/signup)\n\
+    2. Access the access token page in [My Account > API Keys](https://www.malt.com/account/tokens)\n3. Create an access token\
+    \ with related permission scopes\n4. Copy the access token, it will only be accessible at the moment you see it.\n\n##\
+    \ Using Your Token\n\nInclude your token in the `Authorization` header of every request:\n\n```http\n\nGET https://api.malt.com/exposed/endpoint\n\
+    Authorization: YOUR_TOKEN_HERE\nContent-Type: application/json\n```\n\n### Example with cURL\n\n```bash\ncurl -H \"Authorization:\
+    \ YOUR_TOKEN_HERE\" \\\n     -H \"Content-Type: application/json\" \\\n     https://api.malt.com/exposed/endpoint\n```\n\
+    \n### Example with JavaScript\n\n```javascript\nconst response = await fetch('https://api.malt.com/exposed/endpoint',\
+    \ {\n  headers: {\n    'Authorization': 'YOUR_TOKEN_HERE',\n    'Content-Type': 'application/json'\n  }\n});\n```\n\n\
+    ## Token Security\n\n⚠️ **Important Security Guidelines:**\n\n- Never expose your token in client-side code\n- Store tokens\
+    \ securely\n- Rotate tokens regularly\n- Monitor token usage in your API dashboard\n\n## Error Responses\n\nCommon authentication\
+    \ errors:\n\n### 401 Unauthorized\n```json\n{\n   \"timestamp\": \"1970-01-01T00:00:00.000+00:00\",\n   \"status\": 401,\n\
+    \   \"error\": \"Unauthorized\",\n   \"path\": \"/exposed/endpoint\"\n}\n```\n\n### 403 Forbidden\n```json\n{\n   \"timestamp\"\
+    : \"1970-01-01T00:00:00.000+00:00\",\n   \"status\": 403,\n   \"error\": \"Forbidden\",\n   \"path\": \"/exposed/endpoint\"\
+    \n}\n```"
+  contact:
+    name: Malt API Support
+    url: https://malt.com/support
+servers:
+- url: https://api.malt.com
+  description: Production API server
+paths:
+  /freelancer/invoices:
+    get:
+      description: Get invoices for the authenticated freelancer within a specified date range
+      operationId: findInvoices
+      parameters:
+      - description: Start date for the invoice search range
+        example: '2023-01-01T00:00:00Z'
+        explode: true
+        in: query
+        name: since
+        required: true
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: End date for the invoice search range (optional)
+        example: '2023-12-31T23:59:59Z'
+        explode: true
+        in: query
+        name: until
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/InvoiceResource'
+                type: array
+          description: List of invoices retrieved successfully
+        '400':
+          description: Bad request - invalid date format
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+      summary: Retrieve a list of invoices from a date range
+      tags:
+      - Invoices
+  /freelancer/invoices/{id}:
+    get:
+      description: Retrieve a specific invoice by its identifier
+      operationId: getInvoice
+      parameters:
+      - description: Invoice identifier
+        example: INV-123456
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResource'
+          description: Found the invoice
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Invoice not found
+      summary: Get an invoice by its id
+      tags:
+      - Invoices
+  /freelancer/invoices/{id}/pdf:
+    get:
+      description: Retrieve the PDF version of a specific invoice
+      operationId: getInvoicePdf
+      parameters:
+      - description: Invoice identifier
+        example: INV-123456
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PDFInvoiceResource'
+          description: Found the invoice PDF
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Invoice not found
+      summary: Get an invoice PDF by its id
+      tags:
+      - Invoices
+  /freelancer/payments:
+    get:
+      description: Get payment history for the authenticated freelancer within a specified date range
+      operationId: findPayments
+      parameters:
+      - description: Start date for the payment search range
+        example: '2023-01-01T00:00:00Z'
+        explode: true
+        in: query
+        name: since
+        required: true
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: End date for the payment search range (optional)
+        example: '2023-12-31T23:59:59Z'
+        explode: true
+        in: query
+        name: until
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PaymentResource'
+                type: array
+          description: List of payments retrieved successfully
+        '400':
+          description: Bad request - invalid date format
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+      summary: Retrieve list of payments from a range of date
+      tags:
+      - Payments
+  /freelancer/fee-invoices:
+    get:
+      description: Get service charge invoices for the authenticated freelancer within a specified date range
+      operationId: findFeeInvoices
+      parameters:
+      - description: Start date for the fee invoice search range
+        example: '2023-01-01T00:00:00Z'
+        explode: true
+        in: query
+        name: since
+        required: true
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: End date for the fee invoice search range (optional)
+        example: '2023-12-31T23:59:59Z'
+        explode: true
+        in: query
+        name: until
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/FeeInvoiceResource'
+                type: array
+          description: List of fee invoices retrieved successfully
+        '400':
+          description: Bad request - invalid date format
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+      summary: Retrieve a list of service charge invoices from a date range
+      tags:
+      - Fee Invoices
+  /freelancer/fee-invoices/{id}:
+    get:
+      description: Retrieve a specific service charge invoice by its identifier
+      operationId: getFeeInvoice
+      parameters:
+      - description: Fee invoice identifier
+        example: FEE-123456
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeeInvoiceResource'
+          description: Found the service charge invoice
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Invoice not found
+      summary: Get a service charge invoice by its id
+      tags:
+      - Fee Invoices
+  /freelancer/fee-invoices/{id}/pdf:
+    get:
+      description: Retrieve the PDF version of a specific fee invoice
+      operationId: getFeeInvoicePdf
+      parameters:
+      - description: Fee invoice identifier
+        example: FEE-123456
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PDFInvoiceResource'
+          description: Found the fee invoice PDF
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Fee Invoice not found
+      summary: Get an fee invoice PDF by its id
+      tags:
+      - Fee Invoices
+  /scim/v2/Users:
+    get:
+      description: 'Query existing users.
+
+
+        See [RFC 7643 - "User" Resource Schema](https://tools.ietf.org/html/rfc7643#section-4.1)
+
+
+        See [RFC 7644 - Query Resources](https://tools.ietf.org/html/rfc7644#section-3.4.2)
+
+        '
+      operationId: findUsers
+      parameters:
+      - description: 'Non-negative integer.
+
+          Specifies the desired maximum number of query results per page, e.g., 10.
+
+          A value of "0" indicates that no resource results are to be returned except for "totalResults".
+
+          If unspecified, the maximum number of results is set by the service provider.
+
+          '
+        example: 10
+        explode: true
+        in: query
+        name: count
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: 'The only supported operator is `eq` (meaning "equal").
+
+          The attribute and operator values must be identical for a match.
+
+          '
+        example: filter=userName eq "jane.doe@acme.com"
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'The 1-based index of the first query result.
+
+          '
+        example: 1
+        explode: true
+        in: query
+        name: startIndex
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+          description: Success
+      security:
+      - ApiKeyAuth: []
+      summary: Query existing users
+      tags:
+      - SCIM
+    post:
+      description: 'See [RFC 7644 - Creating Resources](https://tools.ietf.org/html/rfc7644#section-3.3)
+
+        '
+      operationId: createUser
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/SubmittedUserResource'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+          description: User successfully created
+      security:
+      - ApiKeyAuth: []
+      summary: Create a user
+      tags:
+      - SCIM
+  /scim/v2/Users/{userId}:
+    delete:
+      description: 'Delete a user on Malt, if possible.
+
+
+        Should the user have pending actions that must be completed, the deletion will fail.
+
+
+        See [RFC 7644 - Deleting Resources](https://tools.ietf.org/html/rfc7644#section-3.6)
+
+        '
+      operationId: deleteUser
+      parameters:
+      - description: The ID of the user concerned
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          pattern: ^(?!\s*$).+
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: User successfully deleted
+        '403':
+          description: 'Deletion is forbidden, for instance because the user has actions that must be completed
+
+            first.
+
+            '
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a user
+      tags:
+      - SCIM
+    get:
+      operationId: getUserById
+      parameters:
+      - description: The ID of the user concerned
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          pattern: ^(?!\s*$).+
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+          description: The requested user.
+        '404':
+          description: No user exists with the provided ID
+      security:
+      - ApiKeyAuth: []
+      summary: Fetch an existing user
+      tags:
+      - SCIM
+    patch:
+      description: '**For now this operation only supports passing the `active` attribute of the user to `false`,
+
+        which is equivalent to deleting the user.**
+
+
+        See [RFC 7644 - Modifying with PATCH](https://tools.ietf.org/html/rfc7644#section-3.5.2)
+
+        '
+      operationId: modifyUser
+      parameters:
+      - description: The ID of the user concerned
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          pattern: ^(?!\s*$).+
+          type: string
+        style: simple
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/UserPatchBody'
+        required: true
+      responses:
+        '204':
+          description: User successfully modified
+        '404':
+          description: No user exists with the provided ID
+      security:
+      - ApiKeyAuth: []
+      summary: Modify a user (only accepts setting `active` to `false` for now)
+      tags:
+      - SCIM
+    put:
+      description: 'Replace all (non-readonly, non-immutable) details of the user with the ones provided.
+
+
+        MUST NOT be used to create new users.
+
+
+        You MAY explicitly pass `null` to unset a (readable, non-required) value.
+
+
+        See [RFC 7644 - Replacing with PUT](https://tools.ietf.org/html/rfc7644#section-3.5.1)
+
+        '
+      operationId: replaceUser
+      parameters:
+      - description: The ID of the user concerned
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          pattern: ^(?!\s*$).+
+          type: string
+        style: simple
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/SubmittedUserResource'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+          description: User successfully replaced
+        '404':
+          description: No user exists with the provided ID
+      security:
+      - ApiKeyAuth: []
+      summary: Replace a user
+      tags:
+      - SCIM
+components:
+  schemas:
+    InvoiceResource:
+      description: Represents a freelancer invoice
+      properties:
+        id:
+          description: Unique identifier for the invoice
+          example: INV-123456
+          type: string
+        title:
+          description: Invoice title or description
+          example: Web Development Services - March 2023
+          type: string
+        creationDate:
+          description: Date when the invoice was created
+          example: '2023-03-01T10:00:00Z'
+          format: date-time
+          type: string
+        expectedPaymentDate:
+          description: Expected payment date for the invoice
+          example: '2023-03-31T23:59:59Z'
+          format: date-time
+          type: string
+        externalId:
+          description: External identifier for the invoice
+          example: EXT-789
+          nullable: true
+          type: string
+        amountAllTaxesIncluded:
+          description: Total amount including all taxes
+          example: 1200
+          format: decimal
+          type: number
+        amountWithoutTaxes:
+          description: Amount excluding taxes
+          example: 1000
+          format: decimal
+          type: number
+        taxes:
+          description: List of taxes applied to the invoice
+          items:
+            $ref: '#/components/schemas/TaxResource'
+          type: array
+        customer:
+          $ref: '#/components/schemas/CustomerResource'
+        supplier:
+          $ref: '#/components/schemas/SupplierResource'
+      required:
+      - amountAllTaxesIncluded
+      - amountWithoutTaxes
+      - creationDate
+      - customer
+      - expectedPaymentDate
+      - id
+      - supplier
+      - taxes
+      - title
+      type: object
+    PaymentResource:
+      description: Represents a payment made to the freelancer
+      properties:
+        id:
+          description: Unique identifier for the payment
+          example: PAY-123456
+          type: string
+        date:
+          description: Date when the payment was made
+          example: '2023-04-01T10:00:00Z'
+          format: date-time
+          type: string
+        amount:
+          description: Payment amount
+          example: 1200
+          format: decimal
+          type: number
+        currency:
+          description: Currency code for the payment
+          example: EUR
+          type: string
+        wireRef:
+          description: Wire transfer reference
+          example: WIRE-REF-789
+          nullable: true
+          type: string
+        invoices:
+          description: List of invoices covered by this payment
+          items:
+            $ref: '#/components/schemas/LightInvoiceResource'
+          type: array
+      required:
+      - amount
+      - currency
+      - date
+      - id
+      - invoices
+      type: object
+    FeeInvoiceResource:
+      description: Represents a service charge invoice
+      properties:
+        id:
+          description: Unique identifier for the fee invoice
+          example: FEE-123456
+          type: string
+        title:
+          description: Fee invoice title or description
+          example: Service Charges - March 2023
+          type: string
+        amountAllTaxesIncluded:
+          description: Total amount including all taxes
+          example: 240
+          format: decimal
+          type: number
+        amountWithoutTaxes:
+          description: Amount excluding taxes
+          example: 200
+          format: decimal
+          type: number
+        taxes:
+          description: List of taxes applied to the fee invoice
+          items:
+            $ref: '#/components/schemas/TaxResource'
+          type: array
+        customer:
+          $ref: '#/components/schemas/CustomerResource'
+        supplier:
+          $ref: '#/components/schemas/SupplierResource'
+      required:
+      - amountAllTaxesIncluded
+      - amountWithoutTaxes
+      - customer
+      - id
+      - supplier
+      - taxes
+      - title
+      type: object
+    PDFInvoiceResource:
+      description: Represents an invoice in PDF format
+      properties:
+        id:
+          description: Unique identifier for the invoice
+          example: INV-123456
+          type: string
+        pdf:
+          description: Base64 encoded PDF content
+          example: SlZCRVJpMHhMalFLSmRQci4uLg==
+          format: byte
+          type: string
+      required:
+      - id
+      - pdf
+      type: object
+    LightInvoiceResource:
+      description: Lightweight representation of an invoice
+      properties:
+        id:
+          description: Unique identifier for the invoice
+          example: INV-123456
+          type: string
+        externalId:
+          description: External identifier for the invoice
+          example: EXT-789
+          nullable: true
+          type: string
+        type:
+          $ref: '#/components/schemas/LightInvoiceType'
+      required:
+      - id
+      - type
+      type: object
+    CustomerResource:
+      description: Represents a customer (client) for invoicing
+      properties:
+        name:
+          description: Customer company or individual name
+          example: Acme Corporation
+          type: string
+        street:
+          description: Street address
+          example: 123 Business Street
+          nullable: true
+          type: string
+        city:
+          description: City name
+          example: Paris
+          nullable: true
+          type: string
+        zip:
+          description: Postal code
+          example: '75001'
+          nullable: true
+          type: string
+        country:
+          description: Country name
+          example: France
+          nullable: true
+          type: string
+        countryCode:
+          description: Country code (ISO format)
+          example: FR
+          nullable: true
+          type: string
+        registrationNumber:
+          description: Company registration number
+          example: '123456789'
+          nullable: true
+          type: string
+        vatNumber:
+          description: VAT identification number
+          example: FR12345678901
+          nullable: true
+          type: string
+      required:
+      - name
+      type: object
+    SupplierResource:
+      description: Represents a supplier (freelancer) for invoicing
+      properties:
+        name:
+          description: Supplier company or individual name
+          example: John Doe Consulting
+          type: string
+        street:
+          description: Street address
+          example: 456 Freelancer Avenue
+          nullable: true
+          type: string
+        city:
+          description: City name
+          example: Lyon
+          nullable: true
+          type: string
+        zip:
+          description: Postal code
+          example: '69001'
+          nullable: true
+          type: string
+        country:
+          description: Country name
+          example: France
+          nullable: true
+          type: string
+        countryCode:
+          description: Country code (ISO format)
+          example: FR
+          nullable: true
+          type: string
+        registrationNumber:
+          description: Company registration number
+          example: '987654321'
+          nullable: true
+          type: string
+        vatNumber:
+          description: VAT identification number
+          example: FR98765432109
+          nullable: true
+          type: string
+      required:
+      - name
+      type: object
+    TaxResource:
+      description: Represents a tax line item
+      properties:
+        name:
+          description: Tax name or description
+          example: VAT
+          type: string
+        amount:
+          description: Tax amount in the invoice currency
+          example: 200
+          format: decimal
+          type: number
+        rate:
+          description: Tax rate as a percentage
+          example: 20
+          format: decimal
+          type: number
+      required:
+      - amount
+      - name
+      - rate
+      type: object
+    LightInvoiceType:
+      description: Type of invoice
+      enum:
+      - SERVICE_FEES
+      - INVOICE
+      example: INVOICE
+      type: string
+    PageResource:
+      description: A page of resources
+      properties:
+        totalResults:
+          example: 153
+          type: integer
+        startIndex:
+          example: 1
+          type: integer
+        itemsPerPage:
+          example: 10
+          type: integer
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:api:messages:2.0:ListResponse
+            type: string
+          type: array
+        Resources:
+          items:
+            type: object
+          type: array
+      type: object
+    ScimEntity:
+      description: A SCIM entity
+      properties:
+        id:
+          example: 2920b403-fb3b-4e14-9b56-440b218374b6
+          type: string
+        externalId:
+          example: '12345678'
+          type: string
+        meta:
+          $ref: '#/components/schemas/ScimEntity_meta'
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:schemas:core:2.0:User
+            - urn:ietf:params:scim:schemas:extension:malt:2.0:User
+            type: string
+          type: array
+      type: object
+    MaltUserExtension:
+      description: Malt User Extension
+      properties:
+        companyAttributionId:
+          description: Company-specific attribute identifier for company attribution
+          example: hr-group
+          type: string
+      type: object
+    SubmittedUserResource:
+      description: A user
+      properties:
+        externalId:
+          example: '12345678'
+          type: string
+        userName:
+          description: 'A service provider''s unique identifier for the user, typically
+
+            used by the user to directly authenticate to the service provider.
+
+            Often displayed to the user as their unique identifier within the
+
+            system (as opposed to "id" or "externalId", which are generally
+
+            opaque and not user-friendly identifiers).
+
+            '
+          example: jane.doe@acme.com
+          pattern: ^(?!\s*$).+
+          type: string
+        name:
+          $ref: '#/components/schemas/SubmittedUserResource_name'
+        phoneNumbers:
+          description: Phone numbers for the user, formatted as per [RFC 3966](https://tools.ietf.org/html/rfc3966)
+          items:
+            $ref: '#/components/schemas/SubmittedUserResource_phoneNumbers_inner'
+          maxItems: 3
+          minItems: 0
+          type: array
+        urn:ietf:params:scim:schemas:extension:malt:2.0:User:
+          $ref: '#/components/schemas/MaltUserExtension'
+      required:
+      - name
+      - userName
+      type: object
+    UserResource:
+      allOf:
+      - $ref: '#/components/schemas/ScimEntity'
+      - $ref: '#/components/schemas/SubmittedUserResource'
+      - properties:
+          displayName:
+            description: 'The name of the user, suitable for display to end-users.  Each
+
+              user returned MAY include a non-empty displayName value.  The name
+
+              SHOULD be the full name of the User being described, if known
+
+              (e.g., "Babs Jensen" or "Ms. Barbara J Jensen, III") but MAY be a
+
+              username or handle, if that is all that is available (e.g.,
+
+              "bjensen").  The value provided SHOULD be the primary textual
+
+              label by which this User is normally displayed by the service
+
+              provider when presenting it to end-users.
+
+              '
+            example: Jane Doe
+            type: string
+          active:
+            description: 'A Boolean value indicating the user''s administrative status.
+
+
+              Users are always active on Malt.
+
+              '
+            example: true
+            type: boolean
+          emails:
+            description: Email addresses for the User.
+            items:
+              $ref: '#/components/schemas/UserResource_allOf_emails'
+            maxItems: 1
+            minItems: 1
+            type: array
+        type: object
+      description: A user
+    UserPatchBody:
+      description: Body of a PATCH request for a given user
+      properties:
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:api:messages:2.0:PatchOp
+            type: string
+          type: array
+        Operations:
+          description: Operations to apply on the user.
+          items:
+            $ref: '#/components/schemas/UserPatchBody_Operations_inner'
+          type: array
+      required:
+      - Operations
+      - schemas
+      type: object
+    UserPage:
+      allOf:
+      - $ref: '#/components/schemas/PageResource'
+      - properties:
+          Resources:
+            items:
+              $ref: '#/components/schemas/UserResource'
+            type: array
+        type: object
+      description: A page of users
+    ErrorResponse:
+      properties:
+        detail:
+          description: Error message detail
+          type: string
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            type: string
+          type: array
+        scimType:
+          description: Scrim error type
+          enum:
+          - invalidFilter
+          - invalidValue
+          type: string
+        status:
+          description: HTTP status code
+          type: integer
+      type: object
+    ScimEntity_meta:
+      description: Metadata related to this resource
+      properties:
+        resourceType:
+          description: The type of this SCIM resource
+          enum:
+          - User
+          example: User
+          type: string
+        created:
+          description: This resource's creation date, using ISO 8601 format
+          example: '2010-01-23T04:56:22Z'
+          type: string
+        lastModified:
+          description: This resource's last modification date, using ISO 8601 format
+          example: '2011-05-13T04:42:34Z'
+          type: string
+      type: object
+    SubmittedUserResource_name:
+      description: Actual name of the user
+      properties:
+        givenName:
+          description: The given name of the User, or first name in most Western languages
+          example: Jane
+          maxLength: 100
+          pattern: ^(?!\s*$)[\p{L}\p{M}\p{Pd}\p{Z}\d'’‘`.]+$
+          type: string
+        familyName:
+          description: The family name of the User, or last name in most Western languages
+          example: Doe
+          maxLength: 100
+          pattern: ^(?!\s*$)[\p{L}\p{M}\p{Pd}\p{Z}\d'’‘`.]+$
+          type: string
+      required:
+      - familyName
+      - givenName
+      type: object
+    SubmittedUserResource_phoneNumbers_inner:
+      properties:
+        value:
+          example: '33606060606'
+          type: string
+        primary:
+          default: true
+          description: A boolean indicating if this is the preferred phone number among others, if any
+          type: boolean
+      type: object
+    UserResource_allOf_emails:
+      properties:
+        value:
+          example: john.doe@malt.com
+          type: string
+        primary:
+          default: true
+          description: A boolean indicating if this is the preferred email among others, if any
+          type: boolean
+      type: object
+    UserPatchBody_Operations_inner:
+      properties:
+        op:
+          type: string
+        value: {}
+      required:
+      - op
+      - value
+      type: object
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      description: API token obtained from your Malt representative
+      scheme: bearer
+      type: http
+    ApiKeyAuth:
+      description: 'To obtain an access token, please follow [these instructions](https://api.malt.com).
+
+        '
+      in: header
+      name: Authorization
+      type: apiKey
+security: []
+tags:
+- description: Operations related to freelancer invoices
+  name: Invoices
+- description: Operations related to freelancer payments
+  name: Payments
+- description: Operations related to freelancer service charge invoices
+  name: Fee Invoices
+- description: Manage users
+  name: SCIM

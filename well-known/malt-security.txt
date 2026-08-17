@@ -1,0 +1,19 @@
+# Welcome to our Security.txt Page!
+# Thanks for helping keep Malt — and our community — safe. If you’ve found a security issue
+# or have concerns, you’re in the right place. Please follow the guidance below so we can
+# triage quickly and keep everyone protected!
+
+# Vulnerability reports
+# Please submit vulnerabilities via our Vulnerability Disclosure Program (VDP) portal.
+Contact: https://app.yogosha.com/cvd/malt/rqtSc4eIMUj7CKFhA87hI
+
+# Language support
+Preferred-Languages: en, fr
+
+# We're hiring!
+Hiring: https://careers.malt.com/
+
+Canonical: https://malt.com/.well-known/security.txt
+Canonical: https://www.malt.com/.well-known/security.txt
+
+Expires: 2026-03-15T23:59:59Z

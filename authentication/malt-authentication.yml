@@ -1,0 +1,124 @@
+generated: '2026-08-17'
+method: searched
+source: openapi/malt-exposed-apis-openapi.yml
+docs: https://api.malt.com/
+note: >-
+  Baseline derived mechanically from the OpenAPI securitySchemes, then upgraded from Malt's own
+  published authentication guidance (the long info.description on the unified spec, which is the
+  entirety of Malt's API documentation). Two findings a client must know before writing code.
+  (1) The documented header form is a BARE token — `Authorization: your-api-token-here` — with no
+  `Bearer ` prefix, even though the spec also declares an http/bearer scheme with bearerFormat JWT.
+  The prose and the spec disagree; the prose plus the worked cURL and JavaScript examples all show
+  the bare form, so that is what to send. (2) The declared BearerAuth scheme is applied to NO
+  operation, the document's global `security` is an EMPTY ARRAY, and the seven /freelancer/*
+  operations declare no security requirement at all — yet a live unauthenticated call to
+  /freelancer/invoices returns 401. The contract understates its own auth requirement; only the six
+  SCIM operations reference ApiKeyAuth.
+summary:
+  types:
+  - apiKey
+  - http
+  api_key_in:
+  - header
+  oauth2_flows: []
+  oauth2: false
+  oidc: false
+  mutual_tls: false
+  header: Authorization
+  prefix: none (bare token, per Malt's documented examples)
+  token_lifetime: long-lived (no expiry documented, no refresh mechanism)
+  rotation: manual (the docs advise rotating tokens regularly; no API for it)
+schemes:
+- name: BearerAuth
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  description: API token obtained from your Malt representative
+  applied_to_operations: 0
+  applied_note: >-
+    Declared in components.securitySchemes but referenced by no operation and not present in the
+    document's global `security`. Effectively dead in the contract.
+  sources:
+  - openapi/malt-exposed-apis-openapi.yml
+- name: ApiKeyAuth
+  type: apiKey
+  in: header
+  parameter: Authorization
+  description: >-
+    To obtain an access token, please follow the instructions at https://api.malt.com
+  applied_to_operations: 6
+  applied_note: The six SCIM operations under /scim/v2/Users.
+  sources:
+  - openapi/malt-exposed-apis-openapi.yml
+token_types:
+- name: Freelancer account token
+  audience: individual freelancer
+  self_serve: true
+  obtain: >-
+    Create an identity at https://www.malt.com/signup, then generate the token at
+    https://www.malt.com/account/tokens (My Account > API Keys), selecting the permission scopes.
+  scopes: >-
+    The token-creation UI offers "related permission scopes" per Malt's own instructions, but the
+    scope names are not published anywhere public and no oauth2 scope map exists in the spec — so
+    the scope vocabulary is only visible to a signed-in account holder. No scopes/ artifact is
+    emitted for that reason.
+  covers:
+  - /freelancer/invoices
+  - /freelancer/invoices/{id}
+  - /freelancer/invoices/{id}/pdf
+  - /freelancer/payments
+  - /freelancer/fee-invoices
+  - /freelancer/fee-invoices/{id}
+  - /freelancer/fee-invoices/{id}/pdf
+- name: Client team token
+  audience: a buying team inside a client company
+  self_serve: false
+  obtain: Contact your Malt representative.
+- name: Organization token
+  audience: an enterprise organization
+  self_serve: false
+  obtain: Contact your Malt representative.
+  covers:
+  - /scim/v2/Users
+  - /scim/v2/Users/{userId}
+authorization_model:
+  kind: identity-based
+  detail: >-
+    Malt's own wording: "APIs are accessible with a given identity based scope at malt." The token's
+    identity — freelancer, client team, or organization — determines what is visible, rather than a
+    scope string presented per request. A practical consequence: a 403 from this API most often
+    means the WRONG TOKEN TYPE was used, not a missing scope.
+token_handling:
+  displayed_once: true
+  displayed_once_note: >-
+    Malt's instructions state the token "will only be accessible at the moment you see it" — capture
+    it at creation.
+  published_guidance:
+  - Never expose your token in client-side code
+  - Store tokens securely
+  - Rotate tokens regularly
+  - Monitor token usage in your API dashboard
+  guidance_gap: >-
+    The guidance refers to monitoring "token usage in your API dashboard", but no such dashboard is
+    documented or linked anywhere in the public surface.
+discovery:
+  oauth_authorization_server: 404 at https://api.malt.com/.well-known/oauth-authorization-server
+  oauth_protected_resource: 404 at https://api.malt.com/.well-known/oauth-protected-resource
+  openid_configuration: 404 at https://api.malt.com/.well-known/openid-configuration
+  finding: >-
+    No machine-readable auth discovery of any kind. An agent cannot negotiate credentials; a human
+    must obtain a token out of band.
+live_behaviour:
+- url: https://api.malt.com/freelancer/invoices?since=2026-01-01
+  no_credentials: true
+  http_status: 401
+  content_length: 0
+  fetched: '2026-08-17'
+  note: >-
+    Confirms the freelancer surface is auth-gated at runtime despite declaring no security in the
+    spec. The 401 carries no body, so not even the documented error envelope appears.
+- url: https://api.malt.com/scim/v2/Users
+  no_credentials: true
+  http_status: 401
+  content_length: 0
+  fetched: '2026-08-17'

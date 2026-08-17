@@ -1,20 +1,78 @@
 aid: malt
 name: Malt
-description: 'Malt is a company surfaced as a portfolio company of serena and added to the API Evangelist
-  network as a stub for enrichment. Sector: marketplace. This profile is a lead awaiting the enrichment
-  pipeline.'
+description: >-
+  Malt is a European freelance marketplace and Freelance Management System (FMS) founded in 2013 in Paris by Vincent
+  Huguet and Hugo Lassiege, connecting more than a million independent consultants across tech, data, AI, design,
+  marketing and management with enterprise buyers. Beyond matching, the platform handles the administrative spine of
+  freelance engagement: quotes, automated contracts and NDAs, timesheets, invoicing, insured payments and compliance
+  checks, plus an enterprise tier that consolidates an existing freelance roster (Malt Open) and plugs into 85+ ERP,
+  procurement and HR systems including SAP Fieldglass, Coupa and Workday. Malt publishes a small, credential-gated
+  public API surface at api.malt.com documented with Stoplight Elements: a freelancer billing API (invoices, service
+  charge invoices, payments, invoice PDFs) and a SCIM 2.0 user-provisioning endpoint for enterprise identity
+  lifecycle management.
+image: https://dam.malt.com/rebranding2020/malt-logo/malt-brew-only
 url: https://raw.githubusercontent.com/api-evangelist/malt/refs/heads/main/apis.yml
 x-type: company
 x-source: serena-portfolio
-x-tier: stub
-x-tier-reason: portfolio-lead
 specificationVersion: '0.20'
 created: '2026-08-17'
 modified: '2026-08-17'
 tags:
 - Company
 - Marketplace
-apis: []
+- Freelance Marketplace
+- Freelance Management System
+- Talent Marketplace
+- Workforce Management
+- Contingent Workforce
+- Invoicing
+- Payments
+- SCIM
+- Identity Provisioning
+- Procurement
+- Future of Work
+- France
+- Europe
+apis:
+- name: Malt Exposed APIs
+  description: >-
+    Malt's publicly documented API surface, served from api.malt.com and documented with Stoplight Elements against a
+    single unified OpenAPI 3.0.3 document ("Malt - API Guidelines", 13 operations). Two capability groups: a
+    freelancer billing surface (list and retrieve invoices, service charge / fee invoices and payments over a date
+    range, plus invoice PDF retrieval) and a SCIM 2.0 /scim/v2/Users endpoint for enterprise user provisioning
+    (create, read, query, replace, patch-deactivate, delete). Authentication is a bearer/opaque token passed in the
+    Authorization header; freelancer tokens are self-served from My Account > API Keys, while organization and client
+    team tokens are obtained through a Malt representative.
+  humanURL: https://api.malt.com/
+  baseURL: https://api.malt.com
+  tags:
+  - Invoicing
+  - Payments
+  - Billing
+  - SCIM
+  - Identity Provisioning
+  - Freelance Management System
+  properties:
+  - type: OpenAPI
+    url: openapi/malt-exposed-apis-openapi.yml
+  - type: Documentation
+    url: https://api.malt.com/
+  - type: APIReference
+    url: https://api.malt.com/
+  - type: Authentication
+    url: authentication/malt-authentication.yml
+  - type: Conventions
+    url: conventions/malt-conventions.yml
+  - type: DataModel
+    url: data-model/malt-data-model.yml
+  - type: ErrorCatalog
+    url: errors/malt-problem-types.yml
+  - type: Overlay
+    url: overlays/malt-exposed-apis-overlay.yaml
+  - type: MCPServer
+    url: mcp/malt-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/malt-tool-crosswalk.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -22,4 +80,87 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
-  url: https://www.malt.fr/
+  url: https://www.malt.com/
+- type: DeveloperPortal
+  url: https://api.malt.com/
+- type: Documentation
+  url: https://api.malt.com/
+- type: APIReference
+  url: https://api.malt.com/
+- type: GettingStarted
+  url: https://api.malt.com/
+- type: Support
+  url: https://help.malt.com/kb/en/
+- type: HelpCenter
+  url: https://help.malt.com/kb/en/
+- type: Blog
+  url: https://blog.malt.engineering/
+- type: BlogRSS
+  url: https://blog.malt.engineering/feed
+- type: Newsroom
+  url: https://newsroom.malt.com/fr
+- type: GitHubOrganization
+  url: https://github.com/Maltcommunity
+- type: Pricing
+  url: https://www.malt.com/c/pricing
+- type: SignUp
+  url: https://www.malt.com/who-are-you
+- type: Login
+  url: https://www.malt.com/signin
+- type: TermsOfService
+  url: https://www.malt.com/legal
+- type: PrivacyPolicy
+  url: https://www.malt.com/about/privacy
+- type: StatusPage
+  url: https://status.malt.com/
+- type: Careers
+  url: https://careers.malt.com/
+- type: OpenAPI
+  url: openapi/malt-exposed-apis-openapi.yml
+- type: Authentication
+  url: authentication/malt-authentication.yml
+- type: Conventions
+  url: conventions/malt-conventions.yml
+- type: DataModel
+  url: data-model/malt-data-model.yml
+- type: ErrorCatalog
+  url: errors/malt-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/malt-lifecycle.yml
+- type: Conformance
+  url: conformance/malt-conformance.yml
+- type: Overlay
+  url: overlays/malt-exposed-apis-overlay.yaml
+- type: Packages
+  url: packages/malt-packages.yml
+- type: Components
+  url: components/malt-components.yml
+- type: Plans
+  url: plans/malt-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/malt-rate-limits.yml
+- type: MCPServer
+  url: mcp/malt-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/malt-tool-crosswalk.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/malt-llms.txt
+- type: WellKnown
+  url: well-known/malt-well-known.yml
+- type: SecurityTxt
+  url: well-known/malt-security.txt
+- type: VulnerabilityDisclosure
+  url: security/malt-vulnerability-disclosure.yml
+- type: Security
+  url: security/malt-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/malt-domain-security.yml
+- type: AgenticAccess
+  url: agentic-access/malt-agentic-access.yml
+x-enrichment:
+  date: '2026-08-17'
+  status: enriched
+  artifacts_added: 27
+  pass: local-v1
