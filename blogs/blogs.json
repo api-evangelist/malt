@@ -1,0 +1,18 @@
+{
+  "repo": "malt",
+  "feeds": [
+    {
+      "source": "https://help.malt.com/kb/en/",
+      "feed_url": "https://help.malt.com/kb/en/",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    },
+    {
+      "source": "https://blog.malt.engineering/",
+      "error": "HTTPError"
+    }
+  ],
+  "post_count": 0,
+  "fetched": "2026-08-22T20:20:02Z"
+}
