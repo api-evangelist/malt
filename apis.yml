@@ -50,27 +50,16 @@ tags_raw:
 - France
 - Europe
 apis:
-- name: Malt Exposed APIs
-  description: >-
-    Malt's publicly documented API surface, served from api.malt.com and documented with Stoplight Elements against a
-    single unified OpenAPI 3.0.3 document ("Malt - API Guidelines", 13 operations). Two capability groups: a
-    freelancer billing surface (list and retrieve invoices, service charge / fee invoices and payments over a date
-    range, plus invoice PDF retrieval) and a SCIM 2.0 /scim/v2/Users endpoint for enterprise user provisioning
-    (create, read, query, replace, patch-deactivate, delete). Authentication is a bearer/opaque token passed in the
-    Authorization header; freelancer tokens are self-served from My Account > API Keys, while organization and client
-    team tokens are obtained through a Malt representative.
+- aid: malt:malt-fee-invoices-api
+  name: Malt Fee Invoices API
+  description: Operations related to freelancer service charge invoices
   humanURL: https://api.malt.com/
   baseURL: https://api.malt.com
   tags:
-  - Invoicing
-  - Payments
-  - Billing
-  - SCIM
-  - Identity Provisioning
-  - Freelance Management System
+  - Fee Invoices
   properties:
   - type: OpenAPI
-    url: openapi/malt-exposed-apis-openapi.yml
+    url: openapi/malt-fee-invoices-api-openapi.yml
   - type: Documentation
     url: https://api.malt.com/
   - type: APIReference
@@ -83,10 +72,78 @@ apis:
     url: data-model/malt-data-model.yml
   - type: ErrorCatalog
     url: errors/malt-problem-types.yml
-  - type: Overlay
-    url: overlays/malt-exposed-apis-overlay.yaml
-  - type: MCPServer
-    url: mcp/malt-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/malt-tool-crosswalk.yml
+- aid: malt:malt-invoices-api
+  name: Malt Invoices API
+  description: Operations related to freelancer invoices
+  humanURL: https://api.malt.com/
+  baseURL: https://api.malt.com
+  tags:
+  - Invoices
+  properties:
+  - type: OpenAPI
+    url: openapi/malt-invoices-api-openapi.yml
+  - type: Documentation
+    url: https://api.malt.com/
+  - type: APIReference
+    url: https://api.malt.com/
+  - type: Authentication
+    url: authentication/malt-authentication.yml
+  - type: Conventions
+    url: conventions/malt-conventions.yml
+  - type: DataModel
+    url: data-model/malt-data-model.yml
+  - type: ErrorCatalog
+    url: errors/malt-problem-types.yml
+  - type: ToolCrosswalk
+    url: mcp/malt-tool-crosswalk.yml
+- aid: malt:malt-payments-api
+  name: Malt Payments API
+  description: Operations related to freelancer payments
+  humanURL: https://api.malt.com/
+  baseURL: https://api.malt.com
+  tags:
+  - Payments
+  properties:
+  - type: OpenAPI
+    url: openapi/malt-payments-api-openapi.yml
+  - type: Documentation
+    url: https://api.malt.com/
+  - type: APIReference
+    url: https://api.malt.com/
+  - type: Authentication
+    url: authentication/malt-authentication.yml
+  - type: Conventions
+    url: conventions/malt-conventions.yml
+  - type: DataModel
+    url: data-model/malt-data-model.yml
+  - type: ErrorCatalog
+    url: errors/malt-problem-types.yml
+  - type: ToolCrosswalk
+    url: mcp/malt-tool-crosswalk.yml
+- aid: malt:malt-scim-api
+  name: Malt SCIM API
+  description: Manage users
+  humanURL: https://api.malt.com/
+  baseURL: https://api.malt.com
+  tags:
+  - SCIM
+  properties:
+  - type: OpenAPI
+    url: openapi/malt-scim-api-openapi.yml
+  - type: Documentation
+    url: https://api.malt.com/
+  - type: APIReference
+    url: https://api.malt.com/
+  - type: Authentication
+    url: authentication/malt-authentication.yml
+  - type: Conventions
+    url: conventions/malt-conventions.yml
+  - type: DataModel
+    url: data-model/malt-data-model.yml
+  - type: ErrorCatalog
+    url: errors/malt-problem-types.yml
   - type: ToolCrosswalk
     url: mcp/malt-tool-crosswalk.yml
 maintainers:
