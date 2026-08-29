@@ -1,0 +1,25 @@
+slug: malt
+provider: Malt
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Transportation & Logistics
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 1
+edges:
+- tag: SCIM
+  spec_file: malt-scim-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.85
+  evidence: GET /scim/v2/Users "Query existing users", POST /scim/v2/Users "Create a user", DELETE /scim/v2/Users/{userId}
+    "Delete a user"
+  reason: Standard SCIM user provisioning and deprovisioning is identity and access management (joiners-movers-leavers
+    automation), not a business-domain capability.
