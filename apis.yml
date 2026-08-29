@@ -10,6 +10,18 @@ description: >-
   public API surface at api.malt.com documented with Stoplight Elements: a freelancer billing API (invoices, service
   charge invoices, payments, invoice PDFs) and a SCIM 2.0 user-provisioning endpoint for enterprise identity
   lifecycle management.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://dam.malt.com/rebranding2020/malt-logo/malt-brew-only
 url: https://raw.githubusercontent.com/api-evangelist/malt/refs/heads/main/apis.yml
 x-type: company
