@@ -1,0 +1,497 @@
+openapi: 3.2.0
+info:
+  title: Malt - API Guidelines SCIM API
+  version: 0.0.1
+  description: "# Table of contents\n\n1. [Overview](/#/#getting-started)\n2. [Authentication](/#/#api-token-types)\n\n\n\n---\n\n# Overview\n\nWelcome to the Malt APIs documentation. This section provides comprehensive information about publicly accessible APIs.\n\n## Getting Started\n\nTo start using Malt's APIs, you'll need:\n\n1. **API Access Token** - Contact your Malt representative to obtain access credentials\n2. **API Documentation** - Browse the available endpoints using the API list on this site\n3. **Rate Limiting Guidelines** - Understand the usage limits and best practices\n\n## Authentication\n\nAll APIs require authentication using access tokens:\n\n```http\nAuthorization: your-api-token-here\n```\n\n## Support\n\nFor support with APIs:\n\n- **Documentation Issues**: Create an issue in the internal documentation repository\n- **API Access**: Contact your Malt representative\n- **Technical Support**: Use the standard Malt support channels\n\n---\n\n# [Authentication](/#authentication)\n\nThis guide explains how to authenticate with Malt's APIs.\n\n## API Token Types\n\nMalt provides different types of API tokens for different use cases:\n\n### Identity Based Tokens\n\nAPIs are accessible with a given identity based scope at malt.\n\n- Freelancer Account tokens\n- Client team token\n- Organization token\n\n## Obtaining an API Token\n\nTo request an API token:\n\n1. **Create an identity** in [signup page](https://www.malt.com/signup)\n2. Access the access token page in [My Account > API Keys](https://www.malt.com/account/tokens)\n3. Create an access token with related permission scopes\n4. Copy the access token, it will only be accessible at the moment you see it.\n\n## Using Your Token\n\nInclude your token in the `Authorization` header of every request:\n\n```http\n\nGET https://api.malt.com/exposed/endpoint\nAuthorization: YOUR_TOKEN_HERE\nContent-Type: application/json\n```\n\n### Example with cURL\n\n```bash\ncurl -H \"Authorization: YOUR_TOKEN_HERE\" \\\n     -H \"Content-Type: application/json\" \\\n     https://api.malt.com/exposed/endpoint\n```\n\n### Example with JavaScript\n\n```javascript\nconst response = await fetch('https://api.malt.com/exposed/endpoint', {\n  headers: {\n    'Authorization': 'YOUR_TOKEN_HERE',\n    'Content-Type': 'application/json'\n  }\n});\n```\n\n## Token Security\n\n⚠️ **Important Security Guidelines:**\n\n- Never expose your token in client-side code\n- Store tokens securely\n- Rotate tokens regularly\n- Monitor token usage in your API dashboard\n\n## Error Responses\n\nCommon authentication errors:\n\n### 401 Unauthorized\n```json\n{\n   \"timestamp\": \"1970-01-01T00:00:00.000+00:00\",\n   \"status\": 401,\n   \"error\": \"Unauthorized\",\n   \"path\": \"/exposed/endpoint\"\n}\n```\n\n### 403 Forbidden\n```json\n{\n   \"timestamp\": \"1970-01-01T00:00:00.000+00:00\",\n   \"status\": 403,\n   \"error\": \"Forbidden\",\n   \"path\": \"/exposed/endpoint\"\n}\n```"
+  contact:
+    name: Malt API Support
+    url: https://malt.com/support
+servers:
+- url: https://api.malt.com
+  description: Production API server
+security: []
+tags:
+- description: Manage users
+  name: SCIM
+paths:
+  /scim/v2/Users:
+    get:
+      description: 'Query existing users.
+
+
+        See [RFC 7643 - "User" Resource Schema](https://tools.ietf.org/html/rfc7643#section-4.1)
+
+
+        See [RFC 7644 - Query Resources](https://tools.ietf.org/html/rfc7644#section-3.4.2)
+
+        '
+      operationId: findUsers
+      parameters:
+      - description: 'Non-negative integer.
+
+          Specifies the desired maximum number of query results per page, e.g., 10.
+
+          A value of "0" indicates that no resource results are to be returned except for "totalResults".
+
+          If unspecified, the maximum number of results is set by the service provider.
+
+          '
+        example: 10
+        explode: true
+        in: query
+        name: count
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: 'The only supported operator is `eq` (meaning "equal").
+
+          The attribute and operator values must be identical for a match.
+
+          '
+        example: filter=userName eq "jane.doe@acme.com"
+        explode: true
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 'The 1-based index of the first query result.
+
+          '
+        example: 1
+        explode: true
+        in: query
+        name: startIndex
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+          description: Success
+      security:
+      - ApiKeyAuth: []
+      summary: Query existing users
+      tags:
+      - SCIM
+    post:
+      description: 'See [RFC 7644 - Creating Resources](https://tools.ietf.org/html/rfc7644#section-3.3)
+
+        '
+      operationId: createUser
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/SubmittedUserResource'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+          description: User successfully created
+      security:
+      - ApiKeyAuth: []
+      summary: Create a user
+      tags:
+      - SCIM
+  /scim/v2/Users/{userId}:
+    delete:
+      description: 'Delete a user on Malt, if possible.
+
+
+        Should the user have pending actions that must be completed, the deletion will fail.
+
+
+        See [RFC 7644 - Deleting Resources](https://tools.ietf.org/html/rfc7644#section-3.6)
+
+        '
+      operationId: deleteUser
+      parameters:
+      - description: The ID of the user concerned
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          pattern: ^(?!\s*$).+
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: User successfully deleted
+        '403':
+          description: 'Deletion is forbidden, for instance because the user has actions that must be completed
+
+            first.
+
+            '
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a user
+      tags:
+      - SCIM
+    get:
+      operationId: getUserById
+      parameters:
+      - description: The ID of the user concerned
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          pattern: ^(?!\s*$).+
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+          description: The requested user.
+        '404':
+          description: No user exists with the provided ID
+      security:
+      - ApiKeyAuth: []
+      summary: Fetch an existing user
+      tags:
+      - SCIM
+    patch:
+      description: '**For now this operation only supports passing the `active` attribute of the user to `false`,
+
+        which is equivalent to deleting the user.**
+
+
+        See [RFC 7644 - Modifying with PATCH](https://tools.ietf.org/html/rfc7644#section-3.5.2)
+
+        '
+      operationId: modifyUser
+      parameters:
+      - description: The ID of the user concerned
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          pattern: ^(?!\s*$).+
+          type: string
+        style: simple
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/UserPatchBody'
+        required: true
+      responses:
+        '204':
+          description: User successfully modified
+        '404':
+          description: No user exists with the provided ID
+      security:
+      - ApiKeyAuth: []
+      summary: Modify a user (only accepts setting `active` to `false` for now)
+      tags:
+      - SCIM
+    put:
+      description: 'Replace all (non-readonly, non-immutable) details of the user with the ones provided.
+
+
+        MUST NOT be used to create new users.
+
+
+        You MAY explicitly pass `null` to unset a (readable, non-required) value.
+
+
+        See [RFC 7644 - Replacing with PUT](https://tools.ietf.org/html/rfc7644#section-3.5.1)
+
+        '
+      operationId: replaceUser
+      parameters:
+      - description: The ID of the user concerned
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          pattern: ^(?!\s*$).+
+          type: string
+        style: simple
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/SubmittedUserResource'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/UserResource'
+          description: User successfully replaced
+        '404':
+          description: No user exists with the provided ID
+      security:
+      - ApiKeyAuth: []
+      summary: Replace a user
+      tags:
+      - SCIM
+components:
+  schemas:
+    UserPatchBody:
+      description: Body of a PATCH request for a given user
+      properties:
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:api:messages:2.0:PatchOp
+            type: string
+          type: array
+        Operations:
+          description: Operations to apply on the user.
+          items:
+            $ref: '#/components/schemas/UserPatchBody_Operations_inner'
+          type: array
+      required:
+      - Operations
+      - schemas
+      type: object
+    SubmittedUserResource_phoneNumbers_inner:
+      properties:
+        value:
+          example: '33606060606'
+          type: string
+        primary:
+          default: true
+          description: A boolean indicating if this is the preferred phone number among others, if any
+          type: boolean
+      type: object
+    UserPage:
+      allOf:
+      - $ref: '#/components/schemas/PageResource'
+      - properties:
+          Resources:
+            items:
+              $ref: '#/components/schemas/UserResource'
+            type: array
+        type: object
+      description: A page of users
+    UserPatchBody_Operations_inner:
+      properties:
+        op:
+          type: string
+        value: {}
+      required:
+      - op
+      - value
+      type: object
+    MaltUserExtension:
+      description: Malt User Extension
+      properties:
+        companyAttributionId:
+          description: Company-specific attribute identifier for company attribution
+          example: hr-group
+          type: string
+      type: object
+    SubmittedUserResource_name:
+      description: Actual name of the user
+      properties:
+        givenName:
+          description: The given name of the User, or first name in most Western languages
+          example: Jane
+          maxLength: 100
+          pattern: ^(?!\s*$)[\p{L}\p{M}\p{Pd}\p{Z}\d'’‘`.]+$
+          type: string
+        familyName:
+          description: The family name of the User, or last name in most Western languages
+          example: Doe
+          maxLength: 100
+          pattern: ^(?!\s*$)[\p{L}\p{M}\p{Pd}\p{Z}\d'’‘`.]+$
+          type: string
+      required:
+      - familyName
+      - givenName
+      type: object
+    UserResource_allOf_emails:
+      properties:
+        value:
+          example: john.doe@malt.com
+          type: string
+        primary:
+          default: true
+          description: A boolean indicating if this is the preferred email among others, if any
+          type: boolean
+      type: object
+    PageResource:
+      description: A page of resources
+      properties:
+        totalResults:
+          example: 153
+          type: integer
+        startIndex:
+          example: 1
+          type: integer
+        itemsPerPage:
+          example: 10
+          type: integer
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:api:messages:2.0:ListResponse
+            type: string
+          type: array
+        Resources:
+          items:
+            type: object
+          type: array
+      type: object
+    ScimEntity:
+      description: A SCIM entity
+      properties:
+        id:
+          example: 2920b403-fb3b-4e14-9b56-440b218374b6
+          type: string
+        externalId:
+          example: '12345678'
+          type: string
+        meta:
+          $ref: '#/components/schemas/ScimEntity_meta'
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:schemas:core:2.0:User
+            - urn:ietf:params:scim:schemas:extension:malt:2.0:User
+            type: string
+          type: array
+      type: object
+    ScimEntity_meta:
+      description: Metadata related to this resource
+      properties:
+        resourceType:
+          description: The type of this SCIM resource
+          enum:
+          - User
+          example: User
+          type: string
+        created:
+          description: This resource's creation date, using ISO 8601 format
+          example: '2010-01-23T04:56:22Z'
+          type: string
+        lastModified:
+          description: This resource's last modification date, using ISO 8601 format
+          example: '2011-05-13T04:42:34Z'
+          type: string
+      type: object
+    UserResource:
+      allOf:
+      - $ref: '#/components/schemas/ScimEntity'
+      - $ref: '#/components/schemas/SubmittedUserResource'
+      - properties:
+          displayName:
+            description: 'The name of the user, suitable for display to end-users.  Each
+
+              user returned MAY include a non-empty displayName value.  The name
+
+              SHOULD be the full name of the User being described, if known
+
+              (e.g., "Babs Jensen" or "Ms. Barbara J Jensen, III") but MAY be a
+
+              username or handle, if that is all that is available (e.g.,
+
+              "bjensen").  The value provided SHOULD be the primary textual
+
+              label by which this User is normally displayed by the service
+
+              provider when presenting it to end-users.
+
+              '
+            example: Jane Doe
+            type: string
+          active:
+            description: 'A Boolean value indicating the user''s administrative status.
+
+
+              Users are always active on Malt.
+
+              '
+            example: true
+            type: boolean
+          emails:
+            description: Email addresses for the User.
+            items:
+              $ref: '#/components/schemas/UserResource_allOf_emails'
+            maxItems: 1
+            minItems: 1
+            type: array
+        type: object
+      description: A user
+    SubmittedUserResource:
+      description: A user
+      properties:
+        externalId:
+          example: '12345678'
+          type: string
+        userName:
+          description: 'A service provider''s unique identifier for the user, typically
+
+            used by the user to directly authenticate to the service provider.
+
+            Often displayed to the user as their unique identifier within the
+
+            system (as opposed to "id" or "externalId", which are generally
+
+            opaque and not user-friendly identifiers).
+
+            '
+          example: jane.doe@acme.com
+          pattern: ^(?!\s*$).+
+          type: string
+        name:
+          $ref: '#/components/schemas/SubmittedUserResource_name'
+        phoneNumbers:
+          description: Phone numbers for the user, formatted as per [RFC 3966](https://tools.ietf.org/html/rfc3966)
+          items:
+            $ref: '#/components/schemas/SubmittedUserResource_phoneNumbers_inner'
+          maxItems: 3
+          minItems: 0
+          type: array
+        urn:ietf:params:scim:schemas:extension:malt:2.0:User:
+          $ref: '#/components/schemas/MaltUserExtension'
+      required:
+      - name
+      - userName
+      type: object
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      description: API token obtained from your Malt representative
+      scheme: bearer
+      type: http
+    ApiKeyAuth:
+      description: 'To obtain an access token, please follow [these instructions](https://api.malt.com).
+
+        '
+      in: header
+      name: Authorization
+      type: apiKey

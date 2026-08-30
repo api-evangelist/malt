@@ -1,0 +1,315 @@
+openapi: 3.2.0
+info:
+  title: Malt - API Guidelines Fee Invoices API
+  version: 0.0.1
+  description: "# Table of contents\n\n1. [Overview](/#/#getting-started)\n2. [Authentication](/#/#api-token-types)\n\n\n\n---\n\n# Overview\n\nWelcome to the Malt APIs documentation. This section provides comprehensive information about publicly accessible APIs.\n\n## Getting Started\n\nTo start using Malt's APIs, you'll need:\n\n1. **API Access Token** - Contact your Malt representative to obtain access credentials\n2. **API Documentation** - Browse the available endpoints using the API list on this site\n3. **Rate Limiting Guidelines** - Understand the usage limits and best practices\n\n## Authentication\n\nAll APIs require authentication using access tokens:\n\n```http\nAuthorization: your-api-token-here\n```\n\n## Support\n\nFor support with APIs:\n\n- **Documentation Issues**: Create an issue in the internal documentation repository\n- **API Access**: Contact your Malt representative\n- **Technical Support**: Use the standard Malt support channels\n\n---\n\n# [Authentication](/#authentication)\n\nThis guide explains how to authenticate with Malt's APIs.\n\n## API Token Types\n\nMalt provides different types of API tokens for different use cases:\n\n### Identity Based Tokens\n\nAPIs are accessible with a given identity based scope at malt.\n\n- Freelancer Account tokens\n- Client team token\n- Organization token\n\n## Obtaining an API Token\n\nTo request an API token:\n\n1. **Create an identity** in [signup page](https://www.malt.com/signup)\n2. Access the access token page in [My Account > API Keys](https://www.malt.com/account/tokens)\n3. Create an access token with related permission scopes\n4. Copy the access token, it will only be accessible at the moment you see it.\n\n## Using Your Token\n\nInclude your token in the `Authorization` header of every request:\n\n```http\n\nGET https://api.malt.com/exposed/endpoint\nAuthorization: YOUR_TOKEN_HERE\nContent-Type: application/json\n```\n\n### Example with cURL\n\n```bash\ncurl -H \"Authorization: YOUR_TOKEN_HERE\" \\\n     -H \"Content-Type: application/json\" \\\n     https://api.malt.com/exposed/endpoint\n```\n\n### Example with JavaScript\n\n```javascript\nconst response = await fetch('https://api.malt.com/exposed/endpoint', {\n  headers: {\n    'Authorization': 'YOUR_TOKEN_HERE',\n    'Content-Type': 'application/json'\n  }\n});\n```\n\n## Token Security\n\n⚠️ **Important Security Guidelines:**\n\n- Never expose your token in client-side code\n- Store tokens securely\n- Rotate tokens regularly\n- Monitor token usage in your API dashboard\n\n## Error Responses\n\nCommon authentication errors:\n\n### 401 Unauthorized\n```json\n{\n   \"timestamp\": \"1970-01-01T00:00:00.000+00:00\",\n   \"status\": 401,\n   \"error\": \"Unauthorized\",\n   \"path\": \"/exposed/endpoint\"\n}\n```\n\n### 403 Forbidden\n```json\n{\n   \"timestamp\": \"1970-01-01T00:00:00.000+00:00\",\n   \"status\": 403,\n   \"error\": \"Forbidden\",\n   \"path\": \"/exposed/endpoint\"\n}\n```"
+  contact:
+    name: Malt API Support
+    url: https://malt.com/support
+servers:
+- url: https://api.malt.com
+  description: Production API server
+security: []
+tags:
+- description: Operations related to freelancer service charge invoices
+  name: Fee Invoices
+paths:
+  /freelancer/fee-invoices:
+    get:
+      description: Get service charge invoices for the authenticated freelancer within a specified date range
+      operationId: findFeeInvoices
+      parameters:
+      - description: Start date for the fee invoice search range
+        example: '2023-01-01T00:00:00Z'
+        explode: true
+        in: query
+        name: since
+        required: true
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: End date for the fee invoice search range (optional)
+        example: '2023-12-31T23:59:59Z'
+        explode: true
+        in: query
+        name: until
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/FeeInvoiceResource'
+                type: array
+          description: List of fee invoices retrieved successfully
+        '400':
+          description: Bad request - invalid date format
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+      summary: Retrieve a list of service charge invoices from a date range
+      tags:
+      - Fee Invoices
+  /freelancer/fee-invoices/{id}:
+    get:
+      description: Retrieve a specific service charge invoice by its identifier
+      operationId: getFeeInvoice
+      parameters:
+      - description: Fee invoice identifier
+        example: FEE-123456
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeeInvoiceResource'
+          description: Found the service charge invoice
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Invoice not found
+      summary: Get a service charge invoice by its id
+      tags:
+      - Fee Invoices
+  /freelancer/fee-invoices/{id}/pdf:
+    get:
+      description: Retrieve the PDF version of a specific fee invoice
+      operationId: getFeeInvoicePdf
+      parameters:
+      - description: Fee invoice identifier
+        example: FEE-123456
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PDFInvoiceResource'
+          description: Found the fee invoice PDF
+        '401':
+          description: Unauthorized - invalid or missing authentication
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Fee Invoice not found
+      summary: Get an fee invoice PDF by its id
+      tags:
+      - Fee Invoices
+components:
+  schemas:
+    TaxResource:
+      description: Represents a tax line item
+      properties:
+        name:
+          description: Tax name or description
+          example: VAT
+          type: string
+        amount:
+          description: Tax amount in the invoice currency
+          example: 200
+          format: decimal
+          type: number
+        rate:
+          description: Tax rate as a percentage
+          example: 20
+          format: decimal
+          type: number
+      required:
+      - amount
+      - name
+      - rate
+      type: object
+    SupplierResource:
+      description: Represents a supplier (freelancer) for invoicing
+      properties:
+        name:
+          description: Supplier company or individual name
+          example: John Doe Consulting
+          type: string
+        street:
+          description: Street address
+          example: 456 Freelancer Avenue
+          type:
+          - string
+          - 'null'
+        city:
+          description: City name
+          example: Lyon
+          type:
+          - string
+          - 'null'
+        zip:
+          description: Postal code
+          example: '69001'
+          type:
+          - string
+          - 'null'
+        country:
+          description: Country name
+          example: France
+          type:
+          - string
+          - 'null'
+        countryCode:
+          description: Country code (ISO format)
+          example: FR
+          type:
+          - string
+          - 'null'
+        registrationNumber:
+          description: Company registration number
+          example: '987654321'
+          type:
+          - string
+          - 'null'
+        vatNumber:
+          description: VAT identification number
+          example: FR98765432109
+          type:
+          - string
+          - 'null'
+      required:
+      - name
+      type: object
+    CustomerResource:
+      description: Represents a customer (client) for invoicing
+      properties:
+        name:
+          description: Customer company or individual name
+          example: Acme Corporation
+          type: string
+        street:
+          description: Street address
+          example: 123 Business Street
+          type:
+          - string
+          - 'null'
+        city:
+          description: City name
+          example: Paris
+          type:
+          - string
+          - 'null'
+        zip:
+          description: Postal code
+          example: '75001'
+          type:
+          - string
+          - 'null'
+        country:
+          description: Country name
+          example: France
+          type:
+          - string
+          - 'null'
+        countryCode:
+          description: Country code (ISO format)
+          example: FR
+          type:
+          - string
+          - 'null'
+        registrationNumber:
+          description: Company registration number
+          example: '123456789'
+          type:
+          - string
+          - 'null'
+        vatNumber:
+          description: VAT identification number
+          example: FR12345678901
+          type:
+          - string
+          - 'null'
+      required:
+      - name
+      type: object
+    PDFInvoiceResource:
+      description: Represents an invoice in PDF format
+      properties:
+        id:
+          description: Unique identifier for the invoice
+          example: INV-123456
+          type: string
+        pdf:
+          description: Base64 encoded PDF content
+          example: SlZCRVJpMHhMalFLSmRQci4uLg==
+          format: byte
+          type: string
+      required:
+      - id
+      - pdf
+      type: object
+    FeeInvoiceResource:
+      description: Represents a service charge invoice
+      properties:
+        id:
+          description: Unique identifier for the fee invoice
+          example: FEE-123456
+          type: string
+        title:
+          description: Fee invoice title or description
+          example: Service Charges - March 2023
+          type: string
+        amountAllTaxesIncluded:
+          description: Total amount including all taxes
+          example: 240
+          format: decimal
+          type: number
+        amountWithoutTaxes:
+          description: Amount excluding taxes
+          example: 200
+          format: decimal
+          type: number
+        taxes:
+          description: List of taxes applied to the fee invoice
+          items:
+            $ref: '#/components/schemas/TaxResource'
+          type: array
+        customer:
+          $ref: '#/components/schemas/CustomerResource'
+        supplier:
+          $ref: '#/components/schemas/SupplierResource'
+      required:
+      - amountAllTaxesIncluded
+      - amountWithoutTaxes
+      - customer
+      - id
+      - supplier
+      - taxes
+      - title
+      type: object
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      description: API token obtained from your Malt representative
+      scheme: bearer
+      type: http
+    ApiKeyAuth:
+      description: 'To obtain an access token, please follow [these instructions](https://api.malt.com).
+
+        '
+      in: header
+      name: Authorization
+      type: apiKey
