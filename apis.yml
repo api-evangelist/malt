@@ -22,6 +22,21 @@ deliveryModel:
   - pricing
   generated: '2026-08-28'
   method: derived
+accessModel:
+  pricing: paid
+  onboarding: unknown
+  trial: false
+  try_now: false
+  public: false
+  label: Paid
+  confidence: high
+  source:
+  - plans
+  - authentication
+  - rate-limits
+  - security
+  generated: '2026-09-03'
+  method: derived
 image: https://dam.malt.com/rebranding2020/malt-logo/malt-brew-only
 url: https://raw.githubusercontent.com/api-evangelist/malt/refs/heads/main/apis.yml
 x-type: company
@@ -227,8 +242,9 @@ common:
   url: plans/malt-plans-pricing.yml
 - type: RateLimits
   url: rate-limits/malt-rate-limits.yml
-- type: MCPServer
+- type: X-MCPServerCandidate
   url: mcp/malt-mcp.yml
+  note: 'Renamed from MCPServer 2026-09-03 (roadmap#247): the manifest self-describes as status: candidate — a tool list derived from the published API contracts, not an existing server. The scorer already read the manifest and reported mcp_server correctly; the MCPServer type was crediting the artifact-type surfaces with a server that does not exist.'
 - type: ToolCrosswalk
   url: mcp/malt-tool-crosswalk.yml
 - type: AgentSkill
