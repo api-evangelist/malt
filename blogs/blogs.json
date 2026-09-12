@@ -2,6 +2,10 @@
   "repo": "malt",
   "feeds": [
     {
+      "source": "https://blog.malt.engineering/",
+      "error": "HTTPError"
+    },
+    {
       "source": "https://help.malt.com/kb/en/",
       "feed_url": "https://help.malt.com/kb/en/",
       "title": "",
@@ -9,13 +13,13 @@
       "method": "none"
     },
     {
-      "source": "https://blog.malt.engineering/",
+      "source": "https://blog.malt.engineering/feed",
       "feed_url": "https://blog.malt.engineering/feed",
       "title": "",
       "saved": 0,
-      "method": "discovered"
+      "method": "feed"
     }
   ],
-  "post_count": 0,
-  "fetched": "2026-08-30T22:33:40Z"
+  "post_count": 10,
+  "fetched": "2026-09-06T19:17:18Z"
 }
