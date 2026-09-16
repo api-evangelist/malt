@@ -1,15 +1,14 @@
 aid: malt
 name: Malt
-description: >-
-  Malt is a European freelance marketplace and Freelance Management System (FMS) founded in 2013 in Paris by Vincent
-  Huguet and Hugo Lassiege, connecting more than a million independent consultants across tech, data, AI, design,
-  marketing and management with enterprise buyers. Beyond matching, the platform handles the administrative spine of
-  freelance engagement: quotes, automated contracts and NDAs, timesheets, invoicing, insured payments and compliance
-  checks, plus an enterprise tier that consolidates an existing freelance roster (Malt Open) and plugs into 85+ ERP,
-  procurement and HR systems including SAP Fieldglass, Coupa and Workday. Malt publishes a small, credential-gated
-  public API surface at api.malt.com documented with Stoplight Elements: a freelancer billing API (invoices, service
-  charge invoices, payments, invoice PDFs) and a SCIM 2.0 user-provisioning endpoint for enterprise identity
-  lifecycle management.
+description: 'Malt is a European freelance marketplace and Freelance Management System (FMS) founded in
+  2013 in Paris by Vincent Huguet and Hugo Lassiege, connecting more than a million independent consultants
+  across tech, data, AI, design, marketing and management with enterprise buyers. Beyond matching, the
+  platform handles the administrative spine of freelance engagement: quotes, automated contracts and NDAs,
+  timesheets, invoicing, insured payments and compliance checks, plus an enterprise tier that consolidates
+  an existing freelance roster (Malt Open) and plugs into 85+ ERP, procurement and HR systems including
+  SAP Fieldglass, Coupa and Workday. Malt publishes a small, credential-gated public API surface at api.malt.com
+  documented with Stoplight Elements: a freelancer billing API (invoices, service charge invoices, payments,
+  invoice PDFs) and a SCIM 2.0 user-provisioning endpoint for enterprise identity lifecycle management.'
 deliveryModel:
   model: saas
   open_source: false
@@ -43,7 +42,7 @@ x-type: company
 x-source: serena-portfolio
 specificationVersion: '0.23'
 created: '2026-08-17'
-modified: '2026-08-17'
+modified: '2026-09-16'
 tags:
 - Company
 - Marketplace
@@ -219,7 +218,7 @@ common:
 - type: Careers
   url: https://careers.malt.com/
 - type: OpenAPI
-  url: openapi/malt-exposed-apis-openapi.yml
+  url: openapi/_original/malt-exposed-apis-openapi.yml
 - type: Authentication
   url: authentication/malt-authentication.yml
 - type: Conventions
@@ -244,7 +243,10 @@ common:
   url: rate-limits/malt-rate-limits.yml
 - type: X-MCPServerCandidate
   url: mcp/malt-mcp.yml
-  note: 'Renamed from MCPServer 2026-09-03 (roadmap#247): the manifest self-describes as status: candidate — a tool list derived from the published API contracts, not an existing server. The scorer already read the manifest and reported mcp_server correctly; the MCPServer type was crediting the artifact-type surfaces with a server that does not exist.'
+  note: 'Renamed from MCPServer 2026-09-03 (roadmap#247): the manifest self-describes as status: candidate
+    — a tool list derived from the published API contracts, not an existing server. The scorer already
+    read the manifest and reported mcp_server correctly; the MCPServer type was crediting the artifact-type
+    surfaces with a server that does not exist.'
 - type: ToolCrosswalk
   url: mcp/malt-tool-crosswalk.yml
 - type: AgentSkill
