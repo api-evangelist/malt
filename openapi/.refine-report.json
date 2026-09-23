@@ -1,0 +1,28 @@
+{
+  "provider": "malt",
+  "sources": [
+    "_original/malt-exposed-apis-openapi.yml"
+  ],
+  "outputs": [
+    "malt-fee-invoices-api-openapi.yml",
+    "malt-invoices-api-openapi.yml",
+    "malt-payments-api-openapi.yml",
+    "malt-scim-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "1 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "malt-exposed-apis-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "_original/malt-unified-exposed-apis-openapi.json: archived document superseded by a larger archived document",
+    "malt-fee-invoices-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "malt-invoices-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "malt-payments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "malt-scim-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}
