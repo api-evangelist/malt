@@ -190,67 +190,6 @@ components:
       - id
       - pdf
       type: object
-    FeeInvoiceResource:
-      description: Represents a service charge invoice
-      properties:
-        id:
-          description: Unique identifier for the fee invoice
-          example: FEE-123456
-          type: string
-        title:
-          description: Fee invoice title or description
-          example: Service Charges - March 2023
-          type: string
-        amountAllTaxesIncluded:
-          description: Total amount including all taxes
-          example: 240
-          format: decimal
-          type: number
-        amountWithoutTaxes:
-          description: Amount excluding taxes
-          example: 200
-          format: decimal
-          type: number
-        taxes:
-          description: List of taxes applied to the fee invoice
-          items:
-            $ref: '#/components/schemas/TaxResource'
-          type: array
-        customer:
-          $ref: '#/components/schemas/CustomerResource'
-        supplier:
-          $ref: '#/components/schemas/SupplierResource'
-      required:
-      - amountAllTaxesIncluded
-      - amountWithoutTaxes
-      - customer
-      - id
-      - supplier
-      - taxes
-      - title
-      type: object
-    TaxResource:
-      description: Represents a tax line item
-      properties:
-        name:
-          description: Tax name or description
-          example: VAT
-          type: string
-        amount:
-          description: Tax amount in the invoice currency
-          example: 200
-          format: decimal
-          type: number
-        rate:
-          description: Tax rate as a percentage
-          example: 20
-          format: decimal
-          type: number
-      required:
-      - amount
-      - name
-      - rate
-      type: object
     SupplierResource:
       description: Represents a supplier (freelancer) for invoicing
       properties:
@@ -302,6 +241,67 @@ components:
           - 'null'
       required:
       - name
+      type: object
+    TaxResource:
+      description: Represents a tax line item
+      properties:
+        name:
+          description: Tax name or description
+          example: VAT
+          type: string
+        amount:
+          description: Tax amount in the invoice currency
+          example: 200
+          format: decimal
+          type: number
+        rate:
+          description: Tax rate as a percentage
+          example: 20
+          format: decimal
+          type: number
+      required:
+      - amount
+      - name
+      - rate
+      type: object
+    FeeInvoiceResource:
+      description: Represents a service charge invoice
+      properties:
+        id:
+          description: Unique identifier for the fee invoice
+          example: FEE-123456
+          type: string
+        title:
+          description: Fee invoice title or description
+          example: Service Charges - March 2023
+          type: string
+        amountAllTaxesIncluded:
+          description: Total amount including all taxes
+          example: 240
+          format: decimal
+          type: number
+        amountWithoutTaxes:
+          description: Amount excluding taxes
+          example: 200
+          format: decimal
+          type: number
+        taxes:
+          description: List of taxes applied to the fee invoice
+          items:
+            $ref: '#/components/schemas/TaxResource'
+          type: array
+        customer:
+          $ref: '#/components/schemas/CustomerResource'
+        supplier:
+          $ref: '#/components/schemas/SupplierResource'
+      required:
+      - amountAllTaxesIncluded
+      - amountWithoutTaxes
+      - customer
+      - id
+      - supplier
+      - taxes
+      - title
       type: object
   securitySchemes:
     BearerAuth:

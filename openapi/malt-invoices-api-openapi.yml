@@ -122,6 +122,63 @@ paths:
       - Invoices
 components:
   schemas:
+    InvoiceResource:
+      description: Represents a freelancer invoice
+      properties:
+        id:
+          description: Unique identifier for the invoice
+          example: INV-123456
+          type: string
+        title:
+          description: Invoice title or description
+          example: Web Development Services - March 2023
+          type: string
+        creationDate:
+          description: Date when the invoice was created
+          example: '2023-03-01T10:00:00Z'
+          format: date-time
+          type: string
+        expectedPaymentDate:
+          description: Expected payment date for the invoice
+          example: '2023-03-31T23:59:59Z'
+          format: date-time
+          type: string
+        externalId:
+          description: External identifier for the invoice
+          example: EXT-789
+          type:
+          - string
+          - 'null'
+        amountAllTaxesIncluded:
+          description: Total amount including all taxes
+          example: 1200
+          format: decimal
+          type: number
+        amountWithoutTaxes:
+          description: Amount excluding taxes
+          example: 1000
+          format: decimal
+          type: number
+        taxes:
+          description: List of taxes applied to the invoice
+          items:
+            $ref: '#/components/schemas/TaxResource'
+          type: array
+        customer:
+          $ref: '#/components/schemas/CustomerResource'
+        supplier:
+          $ref: '#/components/schemas/SupplierResource'
+      required:
+      - amountAllTaxesIncluded
+      - amountWithoutTaxes
+      - creationDate
+      - customer
+      - expectedPaymentDate
+      - id
+      - supplier
+      - taxes
+      - title
+      type: object
     CustomerResource:
       description: Represents a customer (client) for invoicing
       properties:
@@ -190,28 +247,6 @@ components:
       - id
       - pdf
       type: object
-    TaxResource:
-      description: Represents a tax line item
-      properties:
-        name:
-          description: Tax name or description
-          example: VAT
-          type: string
-        amount:
-          description: Tax amount in the invoice currency
-          example: 200
-          format: decimal
-          type: number
-        rate:
-          description: Tax rate as a percentage
-          example: 20
-          format: decimal
-          type: number
-      required:
-      - amount
-      - name
-      - rate
-      type: object
     SupplierResource:
       description: Represents a supplier (freelancer) for invoicing
       properties:
@@ -264,62 +299,27 @@ components:
       required:
       - name
       type: object
-    InvoiceResource:
-      description: Represents a freelancer invoice
+    TaxResource:
+      description: Represents a tax line item
       properties:
-        id:
-          description: Unique identifier for the invoice
-          example: INV-123456
+        name:
+          description: Tax name or description
+          example: VAT
           type: string
-        title:
-          description: Invoice title or description
-          example: Web Development Services - March 2023
-          type: string
-        creationDate:
-          description: Date when the invoice was created
-          example: '2023-03-01T10:00:00Z'
-          format: date-time
-          type: string
-        expectedPaymentDate:
-          description: Expected payment date for the invoice
-          example: '2023-03-31T23:59:59Z'
-          format: date-time
-          type: string
-        externalId:
-          description: External identifier for the invoice
-          example: EXT-789
-          type:
-          - string
-          - 'null'
-        amountAllTaxesIncluded:
-          description: Total amount including all taxes
-          example: 1200
+        amount:
+          description: Tax amount in the invoice currency
+          example: 200
           format: decimal
           type: number
-        amountWithoutTaxes:
-          description: Amount excluding taxes
-          example: 1000
+        rate:
+          description: Tax rate as a percentage
+          example: 20
           format: decimal
           type: number
-        taxes:
-          description: List of taxes applied to the invoice
-          items:
-            $ref: '#/components/schemas/TaxResource'
-          type: array
-        customer:
-          $ref: '#/components/schemas/CustomerResource'
-        supplier:
-          $ref: '#/components/schemas/SupplierResource'
       required:
-      - amountAllTaxesIncluded
-      - amountWithoutTaxes
-      - creationDate
-      - customer
-      - expectedPaymentDate
-      - id
-      - supplier
-      - taxes
-      - title
+      - amount
+      - name
+      - rate
       type: object
   securitySchemes:
     BearerAuth:

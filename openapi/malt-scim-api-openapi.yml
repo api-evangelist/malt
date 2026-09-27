@@ -252,121 +252,6 @@ paths:
       - SCIM
 components:
   schemas:
-    SubmittedUserResource_phoneNumbers_inner:
-      properties:
-        value:
-          example: '33606060606'
-          type: string
-        primary:
-          default: true
-          description: A boolean indicating if this is the preferred phone number among others, if any
-          type: boolean
-      type: object
-    SubmittedUserResource:
-      description: A user
-      properties:
-        externalId:
-          example: '12345678'
-          type: string
-        userName:
-          description: 'A service provider''s unique identifier for the user, typically
-
-            used by the user to directly authenticate to the service provider.
-
-            Often displayed to the user as their unique identifier within the
-
-            system (as opposed to "id" or "externalId", which are generally
-
-            opaque and not user-friendly identifiers).
-
-            '
-          example: jane.doe@acme.com
-          pattern: ^(?!\s*$).+
-          type: string
-        name:
-          $ref: '#/components/schemas/SubmittedUserResource_name'
-        phoneNumbers:
-          description: Phone numbers for the user, formatted as per [RFC 3966](https://tools.ietf.org/html/rfc3966)
-          items:
-            $ref: '#/components/schemas/SubmittedUserResource_phoneNumbers_inner'
-          maxItems: 3
-          minItems: 0
-          type: array
-        urn:ietf:params:scim:schemas:extension:malt:2.0:User:
-          $ref: '#/components/schemas/MaltUserExtension'
-      required:
-      - name
-      - userName
-      type: object
-    UserResource_allOf_emails:
-      properties:
-        value:
-          example: john.doe@malt.com
-          type: string
-        primary:
-          default: true
-          description: A boolean indicating if this is the preferred email among others, if any
-          type: boolean
-      type: object
-    PageResource:
-      description: A page of resources
-      properties:
-        totalResults:
-          example: 153
-          type: integer
-        startIndex:
-          example: 1
-          type: integer
-        itemsPerPage:
-          example: 10
-          type: integer
-        schemas:
-          items:
-            enum:
-            - urn:ietf:params:scim:api:messages:2.0:ListResponse
-            type: string
-          type: array
-        Resources:
-          items:
-            type: object
-          type: array
-      type: object
-    ScimEntity:
-      description: A SCIM entity
-      properties:
-        id:
-          example: 2920b403-fb3b-4e14-9b56-440b218374b6
-          type: string
-        externalId:
-          example: '12345678'
-          type: string
-        meta:
-          $ref: '#/components/schemas/ScimEntity_meta'
-        schemas:
-          items:
-            enum:
-            - urn:ietf:params:scim:schemas:core:2.0:User
-            - urn:ietf:params:scim:schemas:extension:malt:2.0:User
-            type: string
-          type: array
-      type: object
-    UserPatchBody_Operations_inner:
-      properties:
-        op:
-          type: string
-        value: {}
-      required:
-      - op
-      - value
-      type: object
-    MaltUserExtension:
-      description: Malt User Extension
-      properties:
-        companyAttributionId:
-          description: Company-specific attribute identifier for company attribution
-          example: hr-group
-          type: string
-      type: object
     UserResource:
       allOf:
       - $ref: '#/components/schemas/ScimEntity'
@@ -410,6 +295,106 @@ components:
             type: array
         type: object
       description: A user
+    UserPatchBody:
+      description: Body of a PATCH request for a given user
+      properties:
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:api:messages:2.0:PatchOp
+            type: string
+          type: array
+        Operations:
+          description: Operations to apply on the user.
+          items:
+            $ref: '#/components/schemas/UserPatchBody_Operations_inner'
+          type: array
+      required:
+      - Operations
+      - schemas
+      type: object
+    SubmittedUserResource:
+      description: A user
+      properties:
+        externalId:
+          example: '12345678'
+          type: string
+        userName:
+          description: 'A service provider''s unique identifier for the user, typically
+
+            used by the user to directly authenticate to the service provider.
+
+            Often displayed to the user as their unique identifier within the
+
+            system (as opposed to "id" or "externalId", which are generally
+
+            opaque and not user-friendly identifiers).
+
+            '
+          example: jane.doe@acme.com
+          pattern: ^(?!\s*$).+
+          type: string
+        name:
+          $ref: '#/components/schemas/SubmittedUserResource_name'
+        phoneNumbers:
+          description: Phone numbers for the user, formatted as per [RFC 3966](https://tools.ietf.org/html/rfc3966)
+          items:
+            $ref: '#/components/schemas/SubmittedUserResource_phoneNumbers_inner'
+          maxItems: 3
+          minItems: 0
+          type: array
+        urn:ietf:params:scim:schemas:extension:malt:2.0:User:
+          $ref: '#/components/schemas/MaltUserExtension'
+      required:
+      - name
+      - userName
+      type: object
+    ScimEntity:
+      description: A SCIM entity
+      properties:
+        id:
+          example: 2920b403-fb3b-4e14-9b56-440b218374b6
+          type: string
+        externalId:
+          example: '12345678'
+          type: string
+        meta:
+          $ref: '#/components/schemas/ScimEntity_meta'
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:schemas:core:2.0:User
+            - urn:ietf:params:scim:schemas:extension:malt:2.0:User
+            type: string
+          type: array
+      type: object
+    UserPatchBody_Operations_inner:
+      properties:
+        op:
+          type: string
+        value: {}
+      required:
+      - op
+      - value
+      type: object
+    MaltUserExtension:
+      description: Malt User Extension
+      properties:
+        companyAttributionId:
+          description: Company-specific attribute identifier for company attribution
+          example: hr-group
+          type: string
+      type: object
+    SubmittedUserResource_phoneNumbers_inner:
+      properties:
+        value:
+          example: '33606060606'
+          type: string
+        primary:
+          default: true
+          description: A boolean indicating if this is the preferred phone number among others, if any
+          type: boolean
+      type: object
     SubmittedUserResource_name:
       description: Actual name of the user
       properties:
@@ -447,6 +432,16 @@ components:
           example: '2011-05-13T04:42:34Z'
           type: string
       type: object
+    UserResource_allOf_emails:
+      properties:
+        value:
+          example: john.doe@malt.com
+          type: string
+        primary:
+          default: true
+          description: A boolean indicating if this is the preferred email among others, if any
+          type: boolean
+      type: object
     UserPage:
       allOf:
       - $ref: '#/components/schemas/PageResource'
@@ -457,23 +452,28 @@ components:
             type: array
         type: object
       description: A page of users
-    UserPatchBody:
-      description: Body of a PATCH request for a given user
+    PageResource:
+      description: A page of resources
       properties:
+        totalResults:
+          example: 153
+          type: integer
+        startIndex:
+          example: 1
+          type: integer
+        itemsPerPage:
+          example: 10
+          type: integer
         schemas:
           items:
             enum:
-            - urn:ietf:params:scim:api:messages:2.0:PatchOp
+            - urn:ietf:params:scim:api:messages:2.0:ListResponse
             type: string
           type: array
-        Operations:
-          description: Operations to apply on the user.
+        Resources:
           items:
-            $ref: '#/components/schemas/UserPatchBody_Operations_inner'
+            type: object
           type: array
-      required:
-      - Operations
-      - schemas
       type: object
   securitySchemes:
     BearerAuth:
