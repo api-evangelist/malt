@@ -174,22 +174,6 @@ components:
       required:
       - name
       type: object
-    PDFInvoiceResource:
-      description: Represents an invoice in PDF format
-      properties:
-        id:
-          description: Unique identifier for the invoice
-          example: INV-123456
-          type: string
-        pdf:
-          description: Base64 encoded PDF content
-          example: SlZCRVJpMHhMalFLSmRQci4uLg==
-          format: byte
-          type: string
-      required:
-      - id
-      - pdf
-      type: object
     SupplierResource:
       description: Represents a supplier (freelancer) for invoicing
       properties:
@@ -241,6 +225,22 @@ components:
           - 'null'
       required:
       - name
+      type: object
+    PDFInvoiceResource:
+      description: Represents an invoice in PDF format
+      properties:
+        id:
+          description: Unique identifier for the invoice
+          example: INV-123456
+          type: string
+        pdf:
+          description: Base64 encoded PDF content
+          example: SlZCRVJpMHhMalFLSmRQci4uLg==
+          format: byte
+          type: string
+      required:
+      - id
+      - pdf
       type: object
     TaxResource:
       description: Represents a tax line item

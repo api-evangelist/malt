@@ -101,6 +101,13 @@ components:
       - id
       - invoices
       type: object
+    LightInvoiceType:
+      description: Type of invoice
+      enum:
+      - SERVICE_FEES
+      - INVOICE
+      example: INVOICE
+      type: string
     LightInvoiceResource:
       description: Lightweight representation of an invoice
       properties:
@@ -120,13 +127,6 @@ components:
       - id
       - type
       type: object
-    LightInvoiceType:
-      description: Type of invoice
-      enum:
-      - SERVICE_FEES
-      - INVOICE
-      example: INVOICE
-      type: string
   securitySchemes:
     BearerAuth:
       bearerFormat: JWT

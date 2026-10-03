@@ -122,6 +122,148 @@ paths:
       - Invoices
 components:
   schemas:
+    CustomerResource:
+      description: Represents a customer (client) for invoicing
+      properties:
+        name:
+          description: Customer company or individual name
+          example: Acme Corporation
+          type: string
+        street:
+          description: Street address
+          example: 123 Business Street
+          type:
+          - string
+          - 'null'
+        city:
+          description: City name
+          example: Paris
+          type:
+          - string
+          - 'null'
+        zip:
+          description: Postal code
+          example: '75001'
+          type:
+          - string
+          - 'null'
+        country:
+          description: Country name
+          example: France
+          type:
+          - string
+          - 'null'
+        countryCode:
+          description: Country code (ISO format)
+          example: FR
+          type:
+          - string
+          - 'null'
+        registrationNumber:
+          description: Company registration number
+          example: '123456789'
+          type:
+          - string
+          - 'null'
+        vatNumber:
+          description: VAT identification number
+          example: FR12345678901
+          type:
+          - string
+          - 'null'
+      required:
+      - name
+      type: object
+    SupplierResource:
+      description: Represents a supplier (freelancer) for invoicing
+      properties:
+        name:
+          description: Supplier company or individual name
+          example: John Doe Consulting
+          type: string
+        street:
+          description: Street address
+          example: 456 Freelancer Avenue
+          type:
+          - string
+          - 'null'
+        city:
+          description: City name
+          example: Lyon
+          type:
+          - string
+          - 'null'
+        zip:
+          description: Postal code
+          example: '69001'
+          type:
+          - string
+          - 'null'
+        country:
+          description: Country name
+          example: France
+          type:
+          - string
+          - 'null'
+        countryCode:
+          description: Country code (ISO format)
+          example: FR
+          type:
+          - string
+          - 'null'
+        registrationNumber:
+          description: Company registration number
+          example: '987654321'
+          type:
+          - string
+          - 'null'
+        vatNumber:
+          description: VAT identification number
+          example: FR98765432109
+          type:
+          - string
+          - 'null'
+      required:
+      - name
+      type: object
+    PDFInvoiceResource:
+      description: Represents an invoice in PDF format
+      properties:
+        id:
+          description: Unique identifier for the invoice
+          example: INV-123456
+          type: string
+        pdf:
+          description: Base64 encoded PDF content
+          example: SlZCRVJpMHhMalFLSmRQci4uLg==
+          format: byte
+          type: string
+      required:
+      - id
+      - pdf
+      type: object
+    TaxResource:
+      description: Represents a tax line item
+      properties:
+        name:
+          description: Tax name or description
+          example: VAT
+          type: string
+        amount:
+          description: Tax amount in the invoice currency
+          example: 200
+          format: decimal
+          type: number
+        rate:
+          description: Tax rate as a percentage
+          example: 20
+          format: decimal
+          type: number
+      required:
+      - amount
+      - name
+      - rate
+      type: object
     InvoiceResource:
       description: Represents a freelancer invoice
       properties:
@@ -178,148 +320,6 @@ components:
       - supplier
       - taxes
       - title
-      type: object
-    CustomerResource:
-      description: Represents a customer (client) for invoicing
-      properties:
-        name:
-          description: Customer company or individual name
-          example: Acme Corporation
-          type: string
-        street:
-          description: Street address
-          example: 123 Business Street
-          type:
-          - string
-          - 'null'
-        city:
-          description: City name
-          example: Paris
-          type:
-          - string
-          - 'null'
-        zip:
-          description: Postal code
-          example: '75001'
-          type:
-          - string
-          - 'null'
-        country:
-          description: Country name
-          example: France
-          type:
-          - string
-          - 'null'
-        countryCode:
-          description: Country code (ISO format)
-          example: FR
-          type:
-          - string
-          - 'null'
-        registrationNumber:
-          description: Company registration number
-          example: '123456789'
-          type:
-          - string
-          - 'null'
-        vatNumber:
-          description: VAT identification number
-          example: FR12345678901
-          type:
-          - string
-          - 'null'
-      required:
-      - name
-      type: object
-    PDFInvoiceResource:
-      description: Represents an invoice in PDF format
-      properties:
-        id:
-          description: Unique identifier for the invoice
-          example: INV-123456
-          type: string
-        pdf:
-          description: Base64 encoded PDF content
-          example: SlZCRVJpMHhMalFLSmRQci4uLg==
-          format: byte
-          type: string
-      required:
-      - id
-      - pdf
-      type: object
-    SupplierResource:
-      description: Represents a supplier (freelancer) for invoicing
-      properties:
-        name:
-          description: Supplier company or individual name
-          example: John Doe Consulting
-          type: string
-        street:
-          description: Street address
-          example: 456 Freelancer Avenue
-          type:
-          - string
-          - 'null'
-        city:
-          description: City name
-          example: Lyon
-          type:
-          - string
-          - 'null'
-        zip:
-          description: Postal code
-          example: '69001'
-          type:
-          - string
-          - 'null'
-        country:
-          description: Country name
-          example: France
-          type:
-          - string
-          - 'null'
-        countryCode:
-          description: Country code (ISO format)
-          example: FR
-          type:
-          - string
-          - 'null'
-        registrationNumber:
-          description: Company registration number
-          example: '987654321'
-          type:
-          - string
-          - 'null'
-        vatNumber:
-          description: VAT identification number
-          example: FR98765432109
-          type:
-          - string
-          - 'null'
-      required:
-      - name
-      type: object
-    TaxResource:
-      description: Represents a tax line item
-      properties:
-        name:
-          description: Tax name or description
-          example: VAT
-          type: string
-        amount:
-          description: Tax amount in the invoice currency
-          example: 200
-          format: decimal
-          type: number
-        rate:
-          description: Tax rate as a percentage
-          example: 20
-          format: decimal
-          type: number
-      required:
-      - amount
-      - name
-      - rate
       type: object
   securitySchemes:
     BearerAuth:
