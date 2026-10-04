@@ -62,6 +62,32 @@ paths:
       - Payments
 components:
   schemas:
+    LightInvoiceType:
+      description: Type of invoice
+      enum:
+      - SERVICE_FEES
+      - INVOICE
+      example: INVOICE
+      type: string
+    LightInvoiceResource:
+      description: Lightweight representation of an invoice
+      properties:
+        id:
+          description: Unique identifier for the invoice
+          example: INV-123456
+          type: string
+        externalId:
+          description: External identifier for the invoice
+          example: EXT-789
+          type:
+          - string
+          - 'null'
+        type:
+          $ref: '#/components/schemas/LightInvoiceType'
+      required:
+      - id
+      - type
+      type: object
     PaymentResource:
       description: Represents a payment made to the freelancer
       properties:
@@ -100,32 +126,6 @@ components:
       - date
       - id
       - invoices
-      type: object
-    LightInvoiceType:
-      description: Type of invoice
-      enum:
-      - SERVICE_FEES
-      - INVOICE
-      example: INVOICE
-      type: string
-    LightInvoiceResource:
-      description: Lightweight representation of an invoice
-      properties:
-        id:
-          description: Unique identifier for the invoice
-          example: INV-123456
-          type: string
-        externalId:
-          description: External identifier for the invoice
-          example: EXT-789
-          type:
-          - string
-          - 'null'
-        type:
-          $ref: '#/components/schemas/LightInvoiceType'
-      required:
-      - id
-      - type
       type: object
   securitySchemes:
     BearerAuth:

@@ -122,6 +122,28 @@ paths:
       - Fee Invoices
 components:
   schemas:
+    TaxResource:
+      description: Represents a tax line item
+      properties:
+        name:
+          description: Tax name or description
+          example: VAT
+          type: string
+        amount:
+          description: Tax amount in the invoice currency
+          example: 200
+          format: decimal
+          type: number
+        rate:
+          description: Tax rate as a percentage
+          example: 20
+          format: decimal
+          type: number
+      required:
+      - amount
+      - name
+      - rate
+      type: object
     CustomerResource:
       description: Represents a customer (client) for invoicing
       properties:
@@ -174,6 +196,22 @@ components:
       required:
       - name
       type: object
+    PDFInvoiceResource:
+      description: Represents an invoice in PDF format
+      properties:
+        id:
+          description: Unique identifier for the invoice
+          example: INV-123456
+          type: string
+        pdf:
+          description: Base64 encoded PDF content
+          example: SlZCRVJpMHhMalFLSmRQci4uLg==
+          format: byte
+          type: string
+      required:
+      - id
+      - pdf
+      type: object
     SupplierResource:
       description: Represents a supplier (freelancer) for invoicing
       properties:
@@ -225,44 +263,6 @@ components:
           - 'null'
       required:
       - name
-      type: object
-    PDFInvoiceResource:
-      description: Represents an invoice in PDF format
-      properties:
-        id:
-          description: Unique identifier for the invoice
-          example: INV-123456
-          type: string
-        pdf:
-          description: Base64 encoded PDF content
-          example: SlZCRVJpMHhMalFLSmRQci4uLg==
-          format: byte
-          type: string
-      required:
-      - id
-      - pdf
-      type: object
-    TaxResource:
-      description: Represents a tax line item
-      properties:
-        name:
-          description: Tax name or description
-          example: VAT
-          type: string
-        amount:
-          description: Tax amount in the invoice currency
-          example: 200
-          format: decimal
-          type: number
-        rate:
-          description: Tax rate as a percentage
-          example: 20
-          format: decimal
-          type: number
-      required:
-      - amount
-      - name
-      - rate
       type: object
     FeeInvoiceResource:
       description: Represents a service charge invoice

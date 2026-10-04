@@ -252,6 +252,14 @@ paths:
       - SCIM
 components:
   schemas:
+    MaltUserExtension:
+      description: Malt User Extension
+      properties:
+        companyAttributionId:
+          description: Company-specific attribute identifier for company attribution
+          example: hr-group
+          type: string
+      type: object
     SubmittedUserResource:
       description: A user
       properties:
@@ -288,24 +296,25 @@ components:
       - name
       - userName
       type: object
-    SubmittedUserResource_name:
-      description: Actual name of the user
+    SubmittedUserResource_phoneNumbers_inner:
       properties:
-        givenName:
-          description: The given name of the User, or first name in most Western languages
-          example: Jane
-          maxLength: 100
-          pattern: ^(?!\s*$)[\p{L}\p{M}\p{Pd}\p{Z}\d'’‘`.]+$
+        value:
+          example: '33606060606'
           type: string
-        familyName:
-          description: The family name of the User, or last name in most Western languages
-          example: Doe
-          maxLength: 100
-          pattern: ^(?!\s*$)[\p{L}\p{M}\p{Pd}\p{Z}\d'’‘`.]+$
+        primary:
+          default: true
+          description: A boolean indicating if this is the preferred phone number among others, if any
+          type: boolean
+      type: object
+    UserResource_allOf_emails:
+      properties:
+        value:
+          example: john.doe@malt.com
           type: string
-      required:
-      - familyName
-      - givenName
+        primary:
+          default: true
+          description: A boolean indicating if this is the preferred email among others, if any
+          type: boolean
       type: object
     PageResource:
       description: A page of resources
@@ -330,15 +339,24 @@ components:
             type: object
           type: array
       type: object
-    UserResource_allOf_emails:
+    SubmittedUserResource_name:
+      description: Actual name of the user
       properties:
-        value:
-          example: john.doe@malt.com
+        givenName:
+          description: The given name of the User, or first name in most Western languages
+          example: Jane
+          maxLength: 100
+          pattern: ^(?!\s*$)[\p{L}\p{M}\p{Pd}\p{Z}\d'’‘`.]+$
           type: string
-        primary:
-          default: true
-          description: A boolean indicating if this is the preferred email among others, if any
-          type: boolean
+        familyName:
+          description: The family name of the User, or last name in most Western languages
+          example: Doe
+          maxLength: 100
+          pattern: ^(?!\s*$)[\p{L}\p{M}\p{Pd}\p{Z}\d'’‘`.]+$
+          type: string
+      required:
+      - familyName
+      - givenName
       type: object
     UserPage:
       allOf:
@@ -350,6 +368,52 @@ components:
             type: array
         type: object
       description: A page of users
+    UserPatchBody_Operations_inner:
+      properties:
+        op:
+          type: string
+        value: {}
+      required:
+      - op
+      - value
+      type: object
+    ScimEntity:
+      description: A SCIM entity
+      properties:
+        id:
+          example: 2920b403-fb3b-4e14-9b56-440b218374b6
+          type: string
+        externalId:
+          example: '12345678'
+          type: string
+        meta:
+          $ref: '#/components/schemas/ScimEntity_meta'
+        schemas:
+          items:
+            enum:
+            - urn:ietf:params:scim:schemas:core:2.0:User
+            - urn:ietf:params:scim:schemas:extension:malt:2.0:User
+            type: string
+          type: array
+      type: object
+    ScimEntity_meta:
+      description: Metadata related to this resource
+      properties:
+        resourceType:
+          description: The type of this SCIM resource
+          enum:
+          - User
+          example: User
+          type: string
+        created:
+          description: This resource's creation date, using ISO 8601 format
+          example: '2010-01-23T04:56:22Z'
+          type: string
+        lastModified:
+          description: This resource's last modification date, using ISO 8601 format
+          example: '2011-05-13T04:42:34Z'
+          type: string
+      type: object
     UserResource:
       allOf:
       - $ref: '#/components/schemas/ScimEntity'
@@ -393,42 +457,6 @@ components:
             type: array
         type: object
       description: A user
-    MaltUserExtension:
-      description: Malt User Extension
-      properties:
-        companyAttributionId:
-          description: Company-specific attribute identifier for company attribution
-          example: hr-group
-          type: string
-      type: object
-    UserPatchBody_Operations_inner:
-      properties:
-        op:
-          type: string
-        value: {}
-      required:
-      - op
-      - value
-      type: object
-    ScimEntity:
-      description: A SCIM entity
-      properties:
-        id:
-          example: 2920b403-fb3b-4e14-9b56-440b218374b6
-          type: string
-        externalId:
-          example: '12345678'
-          type: string
-        meta:
-          $ref: '#/components/schemas/ScimEntity_meta'
-        schemas:
-          items:
-            enum:
-            - urn:ietf:params:scim:schemas:core:2.0:User
-            - urn:ietf:params:scim:schemas:extension:malt:2.0:User
-            type: string
-          type: array
-      type: object
     UserPatchBody:
       description: Body of a PATCH request for a given user
       properties:
@@ -446,34 +474,6 @@ components:
       required:
       - Operations
       - schemas
-      type: object
-    ScimEntity_meta:
-      description: Metadata related to this resource
-      properties:
-        resourceType:
-          description: The type of this SCIM resource
-          enum:
-          - User
-          example: User
-          type: string
-        created:
-          description: This resource's creation date, using ISO 8601 format
-          example: '2010-01-23T04:56:22Z'
-          type: string
-        lastModified:
-          description: This resource's last modification date, using ISO 8601 format
-          example: '2011-05-13T04:42:34Z'
-          type: string
-      type: object
-    SubmittedUserResource_phoneNumbers_inner:
-      properties:
-        value:
-          example: '33606060606'
-          type: string
-        primary:
-          default: true
-          description: A boolean indicating if this is the preferred phone number among others, if any
-          type: boolean
       type: object
   securitySchemes:
     BearerAuth:
