@@ -64,6 +64,131 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Malt is a company surfaced as a portfolio company of serena and added to the API Evangelist network as a stub for enrichment. Sector: marketplace. This profile is a lead awaiting the enrichment pipeline.
+Malt is a European freelance marketplace and Freelance Management System (FMS) founded in 2013 in Paris by Vincent Huguet and Hugo Lassiege, connecting more than a million independent consultants across tech, data, AI, design, marketing and management with enterprise buyers. Beyond matching, the platform handles the administrative spine of freelance engagement: quotes, automated contracts and NDAs, timesheets, invoicing, insured payments and compliance checks, plus an enterprise tier that consolidates an existing freelance roster (Malt Open) and plugs into 85+ ERP, procurement and HR systems including SAP Fieldglass, Coupa and Workday. Malt publishes a small, credential-gated public API surface at api.malt.com documented with Stoplight Elements: a freelancer billing API (invoices, service charge invoices, payments, invoice PDFs) and a SCIM 2.0 user-provisioning endpoint for enterprise identity lifecycle management.
 
-Source: portfolio company of [serena](https://github.com/api-evangelist/serena) — https://www.malt.fr/
+**Areas:** Company · Marketplace · Freelance Marketplace · Freelance Management System · Talent Marketplace · Workforce Management · Contingent Workforce · Invoicing · Payments · SCIM · Identity Provisioning · Procurement
+
+## Malt on APIs.io
+
+Everything profiled for Malt is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/malt/](https://apis.io/providers/malt/)** — or go straight to one of the APIs or properties below.
+
+### APIs (4)
+
+- [Malt Fee Invoices API](https://apis.io/apis/malt/malt-fee-invoices-api/) — Operations related to freelancer service charge invoices
+- [Malt Invoices API](https://apis.io/apis/malt/malt-invoices-api/) — Operations related to freelancer invoices
+- [Malt Payments API](https://apis.io/apis/malt/malt-payments-api/) — Operations related to freelancer payments
+- [Malt SCIM API](https://apis.io/apis/malt/malt-scim-api/) — Manage users
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [malt](https://apis.io/servers/malt/malt/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Malt Agentic Access](https://apis.io/agentic-access/malt/malt-agentic-access/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Malt Exposed Apis Overlay](https://apis.io/overlays/malt/malt-exposed-apis-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Malt Authentication](https://apis.io/security/malt/malt-authentication/)
+- [Malt Domain Security](https://apis.io/security/malt/malt-domain-security/)
+- [Malt Vulnerability Disclosure](https://apis.io/security/malt/malt-vulnerability-disclosure/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Malt Plans Pricing](https://apis.io/plans/malt/malt-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Malt Rate Limits](https://apis.io/rate-limits/malt/malt-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.malt.com/)
+- [Documentation](https://api.malt.com/)
+- [Getting started](https://api.malt.com/)
+- [API reference](https://api.malt.com/)
+- [Pricing](https://www.malt.com/c/pricing)
+- [Sign up](https://www.malt.com/who-are-you)
+- [Support](https://help.malt.com/kb/en/)
+- [Blog](https://blog.malt.engineering/)
+- [Terms of service](https://www.malt.com/legal)
+- [Privacy policy](https://www.malt.com/about/privacy)
+- [GitHub](https://github.com/Maltcommunity)
+- [Status](https://status.malt.com/)
+
+## API Evangelist rating
+
+**Kin Score 55.3** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 67.0 |
+| Contract quality | 55.8 |
+| Contract governance | 4.5 |
+| Operational transparency | 28.9 |
+| Developer ergonomics | 58.9 |
+| Access clarity | 76.3 |
+
+**Agent readiness 27.0** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 27.7** — Payments
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/malt/](https://apis.io/providers/malt/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Malt: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/malt/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
